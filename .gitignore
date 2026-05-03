@@ -29,18 +29,6 @@ __pycache__/
 *.ubj
 *.joblib
 
-# 图片 / 绘图 / 结果
-*.png
-*.jpg
-*.jpeg
-*.svg
-*.pdf
-*.gif
-*.csv
-*.json
-*.txt
-*.log
-
 # Python 缓存
 *.pyc
 *.pyo

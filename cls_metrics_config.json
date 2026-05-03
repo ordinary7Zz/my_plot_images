@@ -1,0 +1,325 @@
+{
+  "paths": {
+    "clear_base": "",
+    "sota_base": "",
+    "default_output_dir": "D:/workspace/ThyroidAgent/plot_images/out"
+  },
+  "plot": {
+    "model_order": [
+      "ThyroidXAgent",
+      "GPT-5.1",
+      "Qwen3-vl-8B",
+      "MedGemma",
+      "UltraFedFM",
+      "LSNet",
+      "RepViT",
+      "ResNet-50"
+    ],
+    "r_inner": 1.2,
+    "r_per_ring": 0.75,
+    "gap_units": 0.16,
+    "vmin": 0.0,
+    "vmax": 1.0,
+    "figsize": [16, 16],
+    "dpi": 600,
+    "cmap": "coolwarm",
+    "missing_color": "#E0E0E0",
+    "metric_title": "Score"
+  },
+  "fonts": {
+    "default": {
+      "category": 24,
+      "cbar_title": 24,
+      "cbar_ticks": 20,
+      "legend": 20,
+      "pathology": 22
+    }
+  },
+  "category_colors": {
+    "Datasets": "#5e35b1"
+  },
+  "models": [
+    {
+      "display_name": "ResNet-50",
+      "folders": {}
+    },
+    {
+      "display_name": "RepViT",
+      "folders": {}
+    },
+    {
+      "display_name": "LSNet",
+      "folders": {}
+    },
+    {
+      "display_name": "UltraFedFM",
+      "folders": {}
+    },
+    {
+      "display_name": "MedGemma",
+      "folders": {}
+    },
+    {
+      "display_name": "Qwen3-vl-8B",
+      "folders": {}
+    },
+    {
+      "display_name": "GPT-5.1",
+      "folders": {}
+    },
+    {
+      "display_name": "ThyroidXAgent",
+      "folders": {}
+    }
+  ],
+  "datasets": {
+    "auroc": {
+      "file_slug": "cls_auroc",
+      "title": "Performance comparison of classification models (AUROC) across 4 datasets",
+      "table_caption": "Performance comparison of classification models (AUROC) across 4 datasets.",
+      "font_key": "default",
+      "label_style": "map_then_identity",
+      "label_map": {},
+      "metric_title": "AUROC",
+      "plot": {
+        "vmin": 0.0,
+        "vmax": 1.0,
+        "cmap": "coolwarm"
+      },
+      "category_map": {
+        "Datasets": [
+          "TN3K",
+          "DDTI",
+          "ThyroidXL",
+          "TN5K"
+        ]
+      },
+      "manual_values": {
+        "ResNet-50": {
+          "TN3K": 0.7674,
+          "DDTI": 0.6704,
+          "ThyroidXL": 0.9044,
+          "TN5K": 0.9322
+        },
+        "RepViT": {
+          "TN3K": 0.5536,
+          "DDTI": 0.6162,
+          "ThyroidXL": 0.7774,
+          "TN5K": 0.6603
+        },
+        "LSNet": {
+          "TN3K": 0.8095,
+          "DDTI": 0.7751,
+          "ThyroidXL": 0.9178,
+          "TN5K": 0.9091
+        },
+        "UltraFedFM": {
+          "TN3K": 0.8262,
+          "DDTI": 0.7487,
+          "ThyroidXL": 0.9239,
+          "TN5K": 0.9298
+        },
+        "MedGemma": {
+          "TN3K": 0.5165,
+          "DDTI": 0.4848,
+          "ThyroidXL": 0.4415,
+          "TN5K": 0.5226
+        },
+        "Qwen3-vl-8B": {
+          "TN3K": 0.4321,
+          "DDTI": 0.5303,
+          "ThyroidXL": 0.4450,
+          "TN5K": 0.5562
+        },
+        "GPT-5.1": {
+          "TN3K": 0.6401,
+          "DDTI": 0.7051,
+          "ThyroidXL": 0.5998,
+          "TN5K": 0.6733
+        },
+        "ThyroidXAgent": {
+          "TN3K": 0.8461,
+          "DDTI": 0.7518,
+          "ThyroidXL": 0.9611,
+          "TN5K": 0.9476
+        }
+      },
+      "manual_confidence_intervals": {
+        "ResNet-50": {
+          "TN3K": [0.7246, 0.8068],
+          "DDTI": [0.5826, 0.7546],
+          "ThyroidXL": [0.8920, 0.9162],
+          "TN5K": [0.9144, 0.9490]
+        },
+        "RepViT": {
+          "TN3K": [0.5084, 0.5999],
+          "DDTI": [0.5299, 0.6966],
+          "ThyroidXL": [0.7587, 0.7962],
+          "TN5K": [0.6234, 0.6978]
+        },
+        "LSNet": {
+          "TN3K": [0.7723, 0.8428],
+          "DDTI": [0.7044, 0.8409],
+          "ThyroidXL": [0.9061, 0.9290],
+          "TN5K": [0.8874, 0.9292]
+        },
+        "UltraFedFM": {
+          "TN3K": [0.7916, 0.8602],
+          "DDTI": [0.6667, 0.8228],
+          "ThyroidXL": [0.9129, 0.9343],
+          "TN5K": [0.9118, 0.9473]
+        },
+        "MedGemma": {
+          "TN3K": [0.4691, 0.5631],
+          "DDTI": [0.3969, 0.5734],
+          "ThyroidXL": [0.4173, 0.4654],
+          "TN5K": [0.4845, 0.5595]
+        },
+        "Qwen3-vl-8B": {
+          "TN3K": [0.3867, 0.4788],
+          "DDTI": [0.4277, 0.6308],
+          "ThyroidXL": [0.4220, 0.4699],
+          "TN5K": [0.5150, 0.5941]
+        },
+        "GPT-5.1": {
+          "TN3K": [0.5947, 0.6835],
+          "DDTI": [0.6289, 0.7763],
+          "ThyroidXL": [0.5536, 0.6457],
+          "TN5K": [0.6341, 0.7125]
+        },
+        "ThyroidXAgent": {
+          "TN3K": [0.8153, 0.8764],
+          "DDTI": [0.6771, 0.8230],
+          "ThyroidXL": [0.9538, 0.9677],
+          "TN5K": [0.9295, 0.9620]
+        }
+      }
+    },
+    "auprc": {
+      "file_slug": "cls_auprc",
+      "title": "Performance comparison of classification models (AUPRC) across 4 datasets",
+      "table_caption": "Performance comparison of classification models (AUPRC) across 4 datasets.",
+      "font_key": "default",
+      "label_style": "map_then_identity",
+      "label_map": {},
+      "metric_title": "AUPRC",
+      "plot": {
+        "vmin": 0.0,
+        "vmax": 1.0,
+        "cmap": "coolwarm"
+      },
+      "category_map": {
+        "Datasets": [
+          "TN3K",
+          "DDTI",
+          "ThyroidXL",
+          "TN5K"
+        ]
+      },
+      "manual_values": {
+        "ResNet-50": {
+          "TN3K": 0.6882,
+          "DDTI": 0.2755,
+          "ThyroidXL": 0.8882,
+          "TN5K": 0.9674
+        },
+        "RepViT": {
+          "TN3K": 0.4275,
+          "DDTI": 0.1924,
+          "ThyroidXL": 0.7161,
+          "TN5K": 0.6603
+        },
+        "LSNet": {
+          "TN3K": 0.7581,
+          "DDTI": 0.3180,
+          "ThyroidXL": 0.9040,
+          "TN5K": 0.9091
+        },
+        "UltraFedFM": {
+          "TN3K": 0.7353,
+          "DDTI": 0.3480,
+          "ThyroidXL": 0.9100,
+          "TN5K": 0.9701
+        },
+        "MedGemma": {
+          "TN3K": 0.4030,
+          "DDTI": 0.1222,
+          "ThyroidXL": 0.4198,
+          "TN5K": 0.7643
+        },
+        "Qwen3-vl-8B": {
+          "TN3K": 0.3423,
+          "DDTI": 0.2199,
+          "ThyroidXL": 0.4194,
+          "TN5K": 0.7796
+        },
+        "GPT-5.1": {
+          "TN3K": 0.4874,
+          "DDTI": 0.3304,
+          "ThyroidXL": 0.4727,
+          "TN5K": 0.8432
+        },
+        "ThyroidXAgent": {
+          "TN3K": 0.7929,
+          "DDTI": 0.3487,
+          "ThyroidXL": 0.9576,
+          "TN5K": 0.9752
+        }
+      },
+      "manual_confidence_intervals": {
+        "ResNet-50": {
+          "TN3K": [0.6217, 0.7514],
+          "DDTI": [0.1675, 0.3922],
+          "ThyroidXL": [0.8697, 0.9056],
+          "TN5K": [0.9530, 0.9795]
+        },
+        "RepViT": {
+          "TN3K": [0.3903, 0.4803],
+          "DDTI": [0.1474, 0.2857],
+          "ThyroidXL": [0.6901, 0.7428],
+          "TN5K": [0.6234, 0.6978]
+        },
+        "LSNet": {
+          "TN3K": [0.7135, 0.8033],
+          "DDTI": [0.2411, 0.4590],
+          "ThyroidXL": [0.9061, 0.9290],
+          "TN5K": [0.8874, 0.9292]
+        },
+        "UltraFedFM": {
+          "TN3K": [0.6740, 0.8010],
+          "DDTI": [0.2250, 0.4863],
+          "ThyroidXL": [0.8945, 0.9247],
+          "TN5K": [0.9028, 0.9325]
+        },
+        "MedGemma": {
+          "TN3K": [0.3529, 0.4617],
+          "DDTI": [0.0879, 0.1743],
+          "ThyroidXL": [0.3955, 0.4489],
+          "TN5K": [0.7282, 0.7991]
+        },
+        "Qwen3-vl-8B": {
+          "TN3K": [0.3020, 0.3942],
+          "DDTI": [0.1276, 0.3558],
+          "ThyroidXL": [0.3959, 0.4488],
+          "TN5K": [0.7434, 0.8133]
+        },
+        "GPT-5.1": {
+          "TN3K": [0.4362, 0.5381],
+          "DDTI": [0.2493, 0.4165],
+          "ThyroidXL": [0.4275, 0.5183],
+          "TN5K": [0.8014, 0.8846]
+        },
+        "ThyroidXAgent": {
+          "TN3K": [0.7445, 0.8375],
+          "DDTI": [0.2313, 0.4912],
+          "ThyroidXL": [0.9490, 0.9654],
+          "TN5K": [0.9647, 0.9840]
+        }
+      }
+    }
+  },
+  "default_datasets": [
+    "auroc",
+    "auprc"
+  ]
+}

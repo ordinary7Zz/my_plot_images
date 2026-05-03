@@ -1,0 +1,178 @@
+分割 / 分类性能图生成说明
+
+一、用途
+- 生成分割任务的两种图：环形图（radial heatmap）、雷达图（radar）。
+- 生成分类任务的两种图：环形图（radial heatmap）、雷达图（radar）。
+- 分割指标：Dice、HD95。
+- 分类指标：AUROC、AUPRC。
+- 分类横向对比图（paired comparison）：AUROC。
+
+二、对应文件
+1) 分割配置文件
+   - lp_radiomap_config.json
+
+2) 分类配置文件
+   - cls_metrics_config.json
+
+3) 环形图生成脚本
+   - lp_radiomap_from_config.py
+
+4) 雷达图生成脚本
+   - seg_radar_from_config.py
+
+5) 横向对比图生成脚本
+   - paired_comparison_from_config.py
+
+三、配置文件结构
+1) 分割配置 lp_radiomap_config.json
+   - datasets.dice         — Dice 指标（均值 + 置信区间）
+   - datasets.hd95         — HD95 指标（均值 + 置信区间）
+
+2) 分类配置 cls_metrics_config.json
+   - datasets.auroc        — AUROC 指标（均值 + 置信区间）
+   - datasets.auprc        — AUPRC 指标（均值 + 置信区间）
+
+说明：
+- 每个指标放在 datasets 下，通过 manual_values 字段提供绘图均值。
+- 置信区间存放在 manual_confidence_intervals 字段（二维数组 [lower, upper]）。
+- 当前环形图脚本（lp_radiomap_from_config.py）和雷达图脚本（seg_radar_from_config.py）
+  都支持通过 --config 参数动态传入 JSON 配置文件，无需硬编码路径。
+
+四、生成分割任务的环形图
+命令：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json
+
+只生成 Dice：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json \
+      --datasets dice
+
+只生成 HD95：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json \
+      --datasets hd95
+
+五、生成分割任务的雷达图
+命令：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json
+
+只生成 Dice：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json \
+      --datasets dice
+
+只生成 HD95：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/seg_metrics_config.json \
+      --datasets hd95
+
+六、生成分类任务的环形图
+命令：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json
+
+只生成 AUROC：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --datasets auroc
+
+只生成 AUPRC：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --datasets auprc
+
+七、生成分类任务的雷达图
+命令：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json
+
+只生成 AUROC：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --datasets auroc
+
+只生成 AUPRC：
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --datasets auprc
+
+八、生成分类横向对比图
+注意：当前横向对比图脚本仅在 cls_metrics_config.json 上运行，且只支持 AUROC。
+  python paired_comparison_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --datasets auroc
+
+九、指定输出目录
+分割（环形图 + 雷达图）：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/lp_radiomap_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/lp_radiomap_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+分类（环形图 + 雷达图）：
+  python lp_radiomap_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+  python seg_radar_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+十、输出文件
+1) 分割环形图
+   - out/seg_dice_radial_heatmap.png
+   - out/seg_dice_radial_heatmap.pdf
+   - out/seg_hd95_radial_heatmap.png
+   - out/seg_hd95_radial_heatmap.pdf
+
+2) 分割雷达图
+   - out/seg_dice_radar.png
+   - out/seg_dice_radar.pdf
+   - out/seg_hd95_radar.png
+   - out/seg_hd95_radar.pdf
+
+3) 分类环形图
+   - out/cls_auroc_radial_heatmap.png
+   - out/cls_auroc_radial_heatmap.pdf
+   - out/cls_auprc_radial_heatmap.png
+   - out/cls_auprc_radial_heatmap.pdf
+
+4) 分类雷达图
+   - out/cls_auroc_radar.png
+   - out/cls_auroc_radar.pdf
+   - out/cls_auprc_radar.png
+   - out/cls_auprc_radar.pdf
+
+5) 横向对比图
+   - out/cls_auroc_paired_comparison.png
+   - out/cls_auroc_paired_comparison.pdf
+
+十一、后续只需要修改的内容
+1) 改分割数值
+   - lp_radiomap_config.json 中的：
+     - datasets.dice.manual_values              （Dice 均值）
+     - datasets.dice.manual_confidence_intervals （Dice 置信区间）
+     - datasets.hd95.manual_values               （HD95 均值）
+     - datasets.hd95.manual_confidence_intervals （HD95 置信区间）
+
+2) 改分类数值
+   - cls_metrics_config.json 中的：
+     - datasets.auroc.manual_values              （AUROC 均值）
+     - datasets.auroc.manual_confidence_intervals（AUROC 置信区间）
+     - datasets.auprc.manual_values              （AUPRC 均值）
+     - datasets.auprc.manual_confidence_intervals（AUPRC 置信区间）
+
+3) 改显示顺序
+   - 配置文件中的 plot.model_order （模型从外到内的排列顺序）
+   - 各指标下的 category_map.Datasets （数据集在图上出现的顺序）
+
+十二、注意事项
+- 所有脚本都通过 --config 参数动态加载配置文件，不再硬编码路径。
+- 如果 --output-dir 未指定，默认输出到配置文件中 paths.default_output_dir 指定的目录。
+- 当前环形图对 HD95 指标自动做了 "lower_is_better" 处理（反向色阶）。
+- 如果某个数据集的文件夹不存在，脚本会跳过并打印警告，不会中断其他数据集的生成。
