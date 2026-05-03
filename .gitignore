@@ -1,0 +1,46 @@
+# 大型数据 / 模型 / 训练输出
+checkpoints/
+models/
+weights/
+logs/
+runs/
+output/
+outputs/
+results/
+data/
+datasets/
+images/
+masks/
+plots/
+figures/
+viz/
+__pycache__/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# 模型文件
+*.pth
+*.pt
+*.bin
+*.ckpt
+*.h5
+*.pkl
+*.ubj
+*.joblib
+
+# 图片 / 绘图 / 结果
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+*.gif
+*.csv
+*.json
+*.txt
+*.log
+
+# Python 缓存
+*.pyc
+*.pyo
