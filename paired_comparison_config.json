@@ -13,57 +13,26 @@
       "file_slug": "malignancy_tasks",
       "metric_title": "Classification",
       "comparison_plot": {
-        "enabled": true,
-        "baseline_model": "Baseline",
-        "target_model": "ThyroidXAgent",
-        "baseline_label": "Baseline",
-        "target_label": "ThyroidXAgent",
-        "file_suffix": "paired_comparison",
-        "title": "Impact of ThyroidXAgent on Classification Performance",
-        "x_label": "Performance Score",
-        "auto_xlim": false,
-        "xlim_min": 0.30,
-        "xlim_max": 0.75,
-        "xticks": [0.30, 0.40, 0.50, 0.60, 0.70],
-        "figsize": [7.2, 4.2],
-        "dpi": 600,
-        "value_decimals": 4,
-        "percent_decimals": 1,
-        "point_size": 14,
-        "line_width": 1.0,
-        "label_offset_y": 0.13,
-        "improvement_offset_y": 0.17,
-        "title_fontsize": 10,
-        "xlabel_fontsize": 8,
-        "ylabel_fontsize": 7,
-        "value_fontsize": 5,
-        "percent_fontsize": 5,
-        "legend_fontsize": 6,
-        "show_confidence_intervals": false,
-        "baseline_color": "#4c72b0",
-        "target_color": "#dd8452",
-        "line_color": "#a8a8a8",
-        "improvement_color": "#2e7d32",
         "rows": [
           {
             "label": "Subtype Classification\n(Tiger-Model)-\nAUPRC",
-            "baseline": 0.3487,
-            "target": 0.4512
+            "baseline": 0.7117,
+            "target": 0.7863
           },
           {
             "label": "Subtype Classification\n(Tiger-Model)-\nAUROC",
-            "baseline": 0.5095,
-            "target": 0.5862
+            "baseline": 0.7136,
+            "target": 0.8053
           },
           {
             "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUPRC",
-            "baseline": 0.5767,
-            "target": 0.7154
+            "baseline": 0.7363,
+            "target": 0.8808
           },
           {
             "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUROC",
-            "baseline": 0.5238,
-            "target": 0.7063
+            "baseline": 0.7665,
+            "target": 0.8642
           }
         ]
       }

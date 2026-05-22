@@ -11,10 +11,57 @@ from matplotlib.lines import Line2D
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("paired_comparison_config.json")
 SUPPORTED_MANUAL_VALUE_KEYS = ("manual_values", "manual_metric_values")
-MODEL_COLORS = [
-    "#d62728", "#1f77b4", "#2ca02c", "#9467bd", "#ff7f0e", "#8c564b", "#e377c2", "#17becf",
-    "#bcbd22", "#7f7f7f",
-]
+DEFAULT_COMPARISON_PLOT_STYLE = {
+    "file_suffix": "paired_comparison",
+    "x_label": "Performance Score",
+    "auto_xlim": True,
+    "xlim_min": None,
+    "xlim_max": None,
+    "xticks": None,
+    "figsize": None,
+    "dpi": 600,
+    "value_decimals": 4,
+    "percent_decimals": 1,
+    "point_size": 28,
+    "line_width": 1.2,
+    "label_offset_y": 0.14,
+    "improvement_offset_y": 0.18,
+    "title_fontsize": 12,
+    "xlabel_fontsize": 10,
+    "ylabel_fontsize": 9,
+    "value_fontsize": 8,
+    "percent_fontsize": 8,
+    "legend_fontsize": 8,
+    "show_confidence_intervals": True,
+    "baseline_color": "#4c72b0",
+    "target_color": "#dd8452",
+    "line_color": "#a8a8a8",
+    "improvement_color": "#2e7d32",
+}
+DATASET_COMPARISON_PLOT_STYLE = {
+    "malignancy_tasks": {
+        "baseline_model": "Baseline",
+        "target_model": "ThyroidXAgent",
+        "baseline_label": "Baseline",
+        "target_label": "ThyroidXAgent",
+        "title": "Impact of ThyroidXAgent on Classification Performance",
+        "auto_xlim": False,
+        "xlim_min": 0.70,
+        "xlim_max": 0.90,
+        "xticks": [0.70, 0.75, 0.80, 0.85, 0.90],
+        "figsize": [7.2, 4.2],
+        "point_size": 14,
+        "line_width": 1.0,
+        "label_offset_y": 0.13,
+        "improvement_offset_y": 0.17,
+        "title_fontsize": 10,
+        "xlabel_fontsize": 8,
+        "ylabel_fontsize": 7,
+        "value_fontsize": 8,
+        "percent_fontsize": 7,
+        "show_confidence_intervals": False,
+    }
+}
 
 
 def load_json(path: Path) -> Dict[str, Any]:
@@ -68,11 +115,15 @@ def plot_paired_comparison_chart(
     output_dir: Path,
 ) -> None:
     comparison_cfg = dataset_cfg.get("comparison_plot", {})
+    style_cfg = {
+        **DEFAULT_COMPARISON_PLOT_STYLE,
+        **DATASET_COMPARISON_PLOT_STYLE.get(metric_name, {}),
+    }
     custom_rows = comparison_cfg.get("rows")
-    baseline_model = str(comparison_cfg.get("baseline_model", model_order[1] if len(model_order) > 1 else model_order[0]))
-    target_model = str(comparison_cfg.get("target_model", model_order[0]))
-    baseline_label = str(comparison_cfg.get("baseline_label", baseline_model))
-    target_label = str(comparison_cfg.get("target_label", target_model))
+    baseline_model = str(style_cfg.get("baseline_model", model_order[1] if len(model_order) > 1 else model_order[0]))
+    target_model = str(style_cfg.get("target_model", model_order[0]))
+    baseline_label = str(style_cfg.get("baseline_label", baseline_model))
+    target_label = str(style_cfg.get("target_label", target_model))
 
     rows = []
     if isinstance(custom_rows, list) and custom_rows:
@@ -122,7 +173,7 @@ def plot_paired_comparison_chart(
                 }
             )
 
-        sort_by = str(comparison_cfg.get("sort_by", "target")).lower()
+        sort_by = str(style_cfg.get("sort_by", "target")).lower()
         if sort_by == "improvement":
             rows.sort(key=lambda row: row["improvement"])
         elif sort_by == "baseline":
@@ -134,32 +185,31 @@ def plot_paired_comparison_chart(
         print(f"[{metric_name}] No valid paired comparison rows.")
         return
 
-    color_map = {model_name: MODEL_COLORS[idx % len(MODEL_COLORS)] for idx, model_name in enumerate(model_order)}
-    baseline_color = comparison_cfg.get("baseline_color", color_map.get(baseline_model, "#4c72b0"))
-    target_color = comparison_cfg.get("target_color", color_map.get(target_model, "#dd8452"))
-    line_color = comparison_cfg.get("line_color", "#b8b8b8")
-    improvement_color = comparison_cfg.get("improvement_color", "#2e7d32")
+    baseline_color = style_cfg["baseline_color"]
+    target_color = style_cfg["target_color"]
+    line_color = style_cfg["line_color"]
+    improvement_color = style_cfg["improvement_color"]
 
     metric_title = dataset_cfg.get("metric_title", metric_name)
-    figsize = comparison_cfg.get("figsize", [9, max(3.8, 1.2 * len(rows) + 1.8)])
-    dpi = int(comparison_cfg.get("dpi", 600))
-    title = comparison_cfg.get("title", f"Impact of {target_label} on {metric_title} Performance")
-    x_label = comparison_cfg.get("x_label", "Performance Score")
-    file_suffix = comparison_cfg.get("file_suffix", "paired_comparison")
-    value_decimals = int(comparison_cfg.get("value_decimals", 4))
-    percent_decimals = int(comparison_cfg.get("percent_decimals", 1))
-    point_size = float(comparison_cfg.get("point_size", 28))
-    line_width = float(comparison_cfg.get("line_width", 1.2))
-    label_offset_y = float(comparison_cfg.get("label_offset_y", 0.14))
-    improvement_offset_y = float(comparison_cfg.get("improvement_offset_y", 0.18))
-    title_fontsize = float(comparison_cfg.get("title_fontsize", 12))
-    xlabel_fontsize = float(comparison_cfg.get("xlabel_fontsize", 10))
-    ylabel_fontsize = float(comparison_cfg.get("ylabel_fontsize", 9))
-    value_fontsize = float(comparison_cfg.get("value_fontsize", 8))
-    percent_fontsize = float(comparison_cfg.get("percent_fontsize", 8))
-    legend_fontsize = float(comparison_cfg.get("legend_fontsize", 8))
-    show_confidence_intervals = bool(comparison_cfg.get("show_confidence_intervals", True))
-    auto_xlim = bool(comparison_cfg.get("auto_xlim", True))
+    figsize = style_cfg["figsize"] or [9, max(3.8, 1.2 * len(rows) + 1.8)]
+    dpi = int(style_cfg["dpi"])
+    title = style_cfg.get("title") or f"Impact of {target_label} on {metric_title} Performance"
+    x_label = style_cfg["x_label"]
+    file_suffix = style_cfg["file_suffix"]
+    value_decimals = int(style_cfg["value_decimals"])
+    percent_decimals = int(style_cfg["percent_decimals"])
+    point_size = float(style_cfg["point_size"])
+    line_width = float(style_cfg["line_width"])
+    label_offset_y = float(style_cfg["label_offset_y"])
+    improvement_offset_y = float(style_cfg["improvement_offset_y"])
+    title_fontsize = float(style_cfg["title_fontsize"])
+    xlabel_fontsize = float(style_cfg["xlabel_fontsize"])
+    ylabel_fontsize = float(style_cfg["ylabel_fontsize"])
+    value_fontsize = float(style_cfg["value_fontsize"])
+    percent_fontsize = float(style_cfg["percent_fontsize"])
+    legend_fontsize = float(style_cfg["legend_fontsize"])
+    show_confidence_intervals = bool(style_cfg["show_confidence_intervals"])
+    auto_xlim = bool(style_cfg["auto_xlim"])
 
     values = [row["baseline"] for row in rows] + [row["target"] for row in rows]
     if show_confidence_intervals:
@@ -176,8 +226,8 @@ def plot_paired_comparison_chart(
     data_span = data_max - data_min
     padding = max(data_span * 0.08, 0.01 if data_max <= 1.0 else 1.0)
 
-    configured_xlim_min = comparison_cfg.get("xlim_min")
-    configured_xlim_max = comparison_cfg.get("xlim_max")
+    configured_xlim_min = style_cfg.get("xlim_min")
+    configured_xlim_max = style_cfg.get("xlim_max")
     if auto_xlim:
         vmin = data_min - padding
         vmax = data_max + padding
@@ -242,7 +292,7 @@ def plot_paired_comparison_chart(
     ax.set_title(title, fontsize=title_fontsize, pad=10)
     ax.set_xlim(vmin, vmax)
 
-    xticks = comparison_cfg.get("xticks")
+    xticks = style_cfg.get("xticks")
     if not auto_xlim and isinstance(xticks, list) and xticks:
         ax.set_xticks([float(value) for value in xticks])
 
@@ -256,7 +306,7 @@ def plot_paired_comparison_chart(
         Line2D([0], [0], marker="o", color="none", markerfacecolor=baseline_color, markersize=6, label=baseline_label),
         Line2D([0], [0], marker="o", color="none", markerfacecolor=target_color, markersize=6, label=target_label),
     ]
-    ax.legend(handles=legend_handles, loc="lower right", frameon=False, fontsize=legend_fontsize)
+    ax.legend(handles=legend_handles, loc="upper right", frameon=False, fontsize=legend_fontsize)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     file_slug = dataset_cfg.get("file_slug", metric_name)

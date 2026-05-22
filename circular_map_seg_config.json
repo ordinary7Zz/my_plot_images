@@ -4,53 +4,9 @@
     "sota_base": "D:/workspace/ThyroidAgent/data/results_sota",
     "default_output_dir": "D:/workspace/ThyroidAgent/plot_images/out"
   },
-  "plot": {
-    "model_order": [
-      "ThyroidXAgent",
-      "UltraFedFM",
-      "MedSAM2",
-      "MedSegX",
-      "TransUnet",
-      "Paper's Best Res"
-    ],
-    "r_inner": 1.2,
-    "r_per_ring": 0.75,
-    "gap_units": 0.16,
-    "vmin": 0.0,
-    "vmax": 100.0,
-    "figsize": [16, 16],
-    "dpi": 600,
-    "cmap": "coolwarm",
-    "missing_color": "#E0E0E0",
-    "metric_title": "Score"
-  },
-  "fonts": {
-    "default": {
-      "category": 24,
-      "cbar_title": 24,
-      "cbar_ticks": 20,
-      "legend": 22,
-      "pathology": 26
-    }
-  },
-  "category_colors": {
-    "Datasets": "#5e35b1"
-  },
   "models": [
     {
-      "display_name": "Paper's Best Res",
-      "folders": {}
-    },
-    {
-      "display_name": "TransUnet",
-      "folders": {}
-    },
-    {
-      "display_name": "MedSegX",
-      "folders": {}
-    },
-    {
-      "display_name": "MedSAM2",
+      "display_name": "ThyroidXAgent",
       "folders": {}
     },
     {
@@ -58,7 +14,15 @@
       "folders": {}
     },
     {
-      "display_name": "ThyroidXAgent",
+      "display_name": "TransUnet",
+      "folders": {}
+    },
+    {
+      "display_name": "MedSAM2",
+      "folders": {}
+    },
+    {
+      "display_name": "MedSegX",
       "folders": {}
     }
   ],
@@ -66,15 +30,9 @@
     "dice": {
       "file_slug": "seg_dice",
       "title": "Segmentation Dice comparison",
-      "font_key": "default",
       "label_style": "map_then_identity",
       "label_map": {},
       "metric_title": "Dice (%)",
-      "plot": {
-        "vmin": 0.0,
-        "vmax": 100.0,
-        "cmap": "coolwarm"
-      },
       "category_map": {
         "Datasets": [
           "TN3K",
@@ -85,12 +43,6 @@
         ]
       },
       "manual_values": {
-        "Paper's Best Res": {
-          "TN3K": 83.30,
-          "DDTI": 75.37,
-          "ThyroidXL": 72.50,
-          "PKTN": 91.91
-        },
         "TransUnet": {
           "TN3K": 81.46,
           "DDTI": 76.47,
@@ -128,10 +80,6 @@
         }
       },
       "manual_confidence_intervals": {
-        "Paper's Best Res": {
-          "TN3K": [83.04, 83.56],
-          "DDTI": [73.23, 77.51]
-        },
         "TransUnet": {
           "TN3K": [79.84, 83.07],
           "DDTI": [71.68, 81.26],
@@ -172,34 +120,9 @@
     "hd95": {
       "file_slug": "seg_hd95",
       "title": "Segmentation HD95 comparison",
-      "font_key": "default",
       "label_style": "map_then_identity",
       "label_map": {},
       "metric_title": "HD95",
-      "plot": {
-        "vmin": 0.0,
-        "vmax": 100.0,
-        "cmap": "coolwarm",
-        "reverse_axis": true,
-        "radial_breaks": [
-          0.0,
-          10.0,
-          20.0,
-          40.0,
-          60.0,
-          80.0,
-          100.0
-        ],
-        "radial_positions": [
-          0.0,
-          22.0,
-          42.0,
-          68.0,
-          82.0,
-          92.0,
-          100.0
-        ]
-      },
       "category_map": {
         "Datasets": [
           "TN3K",
@@ -210,10 +133,6 @@
         ]
       },
       "manual_values": {
-        "Paper's Best Res": {
-          "TN3K": 13.23,
-          "DDTI": 24.37
-        },
         "TransUnet": {
           "TN3K": 39.27,
           "DDTI": 25.46,
@@ -251,10 +170,6 @@
         }
       },
       "manual_confidence_intervals": {
-        "Paper's Best Res": {
-          "TN3K": [12.60, 13.86],
-          "DDTI": [23.31, 25.43]
-        },
         "TransUnet": {
           "TN3K": [33.75, 44.79],
           "DDTI": [19.92, 31.00],

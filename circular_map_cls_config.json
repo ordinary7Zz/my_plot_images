@@ -1,0 +1,133 @@
+{
+  "paths": {
+    "clear_base": "",
+    "sota_base": "",
+    "default_output_dir": "D:/workspace/ThyroidAgent/plot_images/out"
+  },
+  "models": [
+    {
+      "display_name": "ThyroidXAgent",
+      "folders": {}
+    },
+    {
+      "display_name": "LSNet",
+      "folders": {}
+    },
+    {
+      "display_name": "RepViT",
+      "folders": {}
+    },
+    {
+      "display_name": "GPT-5.1",
+      "folders": {}
+    },
+    {
+      "display_name": "MedGemma",
+      "folders": {}
+    }
+  ],
+  "datasets": {
+    "auroc": {
+      "file_slug": "cls_auroc",
+      "label_style": "map_then_identity",
+      "label_map": {},
+      "metric_title": "AUROC",
+      "group_order": [
+        "Datasets"
+      ],
+      "category_map": {
+        "Datasets": [
+          "TN3K",
+          "DDTI",
+          "ThyroidXL",
+          "TN5K"
+        ]
+      },
+      "manual_values": {
+        "RepViT": {
+          "TN3K": 0.5536,
+          "DDTI": 0.6162,
+          "ThyroidXL": 0.7774,
+          "TN5K": 0.6603
+        },
+        "LSNet": {
+          "TN3K": 0.8095,
+          "DDTI": 0.7451,
+          "ThyroidXL": 0.8878,
+          "TN5K": 0.8891
+        },
+        "MedGemma": {
+          "TN3K": 0.5165,
+          "DDTI": 0.4848,
+          "ThyroidXL": 0.4415,
+          "TN5K": 0.5226
+        },
+        "GPT-5.1": {
+          "TN3K": 0.6401,
+          "DDTI": 0.7051,
+          "ThyroidXL": 0.5998,
+          "TN5K": 0.6733
+        },
+        "ThyroidXAgent": {
+          "TN3K": 0.8661,
+          "DDTI": 0.7918,
+          "ThyroidXL": 0.9811,
+          "TN5K": 0.9676
+        }
+      }
+    },
+    "auprc": {
+      "file_slug": "cls_auprc",
+      "label_style": "map_then_identity",
+      "label_map": {},
+      "metric_title": "AUPRC",
+      "group_order": [
+        "Datasets"
+      ],
+      "category_map": {
+        "Datasets": [
+          "TN3K",
+          "DDTI",
+          "ThyroidXL",
+          "TN5K"
+        ]
+      },
+      "manual_values": {
+        "RepViT": {
+          "TN3K": 0.4275,
+          "DDTI": 0.4924,
+          "ThyroidXL": 0.7161,
+          "TN5K": 0.6603
+        },
+        "LSNet": {
+          "TN3K": 0.7581,
+          "DDTI": 0.618,
+          "ThyroidXL": 0.884,
+          "TN5K": 0.8891
+        },
+        "MedGemma": {
+          "TN3K": 0.403,
+          "DDTI": 0.4222,
+          "ThyroidXL": 0.4198,
+          "TN5K": 0.7643
+        },
+        "GPT-5.1": {
+          "TN3K": 0.4874,
+          "DDTI": 0.6304,
+          "ThyroidXL": 0.4727,
+          "TN5K": 0.8432
+        },
+        "ThyroidXAgent": {
+          "TN3K": 0.8529,
+          "DDTI": 0.7087,
+          "ThyroidXL": 0.9576,
+          "TN5K": 0.9752
+        }
+      }
+    }
+  },
+  "default_datasets": [
+    "auroc",
+    "auprc"
+  ]
+}

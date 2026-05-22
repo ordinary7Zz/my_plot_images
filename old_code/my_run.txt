@@ -10,12 +10,17 @@
 二、对应文件
 1) 分割配置文件
    - lp_radiomap_config.json
+   - circular_map_seg_config.json
 
 2) 分类配置文件
    - cls_metrics_config.json
+   - circular_map_config.json
 
 3) 环形图生成脚本
    - lp_radiomap_from_config.py
+
+3.1) Circos 环形图生成脚本
+   - circular_map_from_config.py
 
 4) 雷达图生成脚本
    - seg_radar_from_config.py
@@ -123,7 +128,66 @@
       --config D:/workspace/ThyroidAgent/plot_images/cls_metrics_config.json \
       --output-dir D:/workspace/ThyroidAgent/plot_images/out
 
-十、输出文件
+十、生成 circos 风格环形图
+说明：
+- 该脚本对应 circular_map.ipynb 的 sector + track 风格。
+- 读取的配置文件分别是：
+  - 分类：circular_map_config.json
+  - 分割：circular_map_seg_config.json
+- 依赖 pycirclize，请确保在已安装 pycirclize 的 Python 环境中运行。
+
+1) 生成分类 circos 图
+命令：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_config.json
+
+只生成 AUROC：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_config.json \
+      --datasets auroc
+
+只生成 AUPRC：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_config.json \
+      --datasets auprc
+
+2) 生成分割 circos 图
+命令：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_seg_config.json
+
+只生成 Dice：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_seg_config.json \
+      --datasets dice
+
+只生成 HD95：
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_seg_config.json \
+      --datasets hd95
+
+3) 指定输出目录
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+  python circular_map_from_config.py \
+      --config D:/workspace/ThyroidAgent/plot_images/circular_map_seg_config.json \
+      --output-dir D:/workspace/ThyroidAgent/plot_images/out
+
+4) 输出文件
+- 分类 circos 图：
+  - out/cls_auroc_circos_heatmap.png
+  - out/cls_auroc_circos_heatmap.pdf
+  - out/cls_auprc_circos_heatmap.png
+  - out/cls_auprc_circos_heatmap.pdf
+
+- 分割 circos 图：
+  - out/seg_dice_circos_heatmap.png
+  - out/seg_dice_circos_heatmap.pdf
+  - out/seg_hd95_circos_heatmap.png
+  - out/seg_hd95_circos_heatmap.pdf
+
 1) 分割环形图
    - out/seg_dice_radial_heatmap.png
    - out/seg_dice_radial_heatmap.pdf
