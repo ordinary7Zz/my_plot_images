@@ -22,16 +22,22 @@ DEFAULT_COMPARISON_PLOT_STYLE = {
     "dpi": 600,
     "value_decimals": 4,
     "percent_decimals": 1,
-    "point_size": 28,
+    "point_size": 34,
     "line_width": 1.2,
-    "label_offset_y": 0.14,
-    "improvement_offset_y": 0.18,
-    "title_fontsize": 12,
-    "xlabel_fontsize": 10,
-    "ylabel_fontsize": 9,
-    "value_fontsize": 8,
-    "percent_fontsize": 8,
-    "legend_fontsize": 8,
+    "title_pad": 14,
+    "value_offset_points": 10,
+    "improvement_offset_points": 12,
+    "improvement_position": "above",
+    "top_margin": 0.90,
+    "bottom_margin": 0.16,
+    "left_margin": 0.32,
+    "right_margin": 0.96,
+    "title_fontsize": 14,
+    "xlabel_fontsize": 11,
+    "ylabel_fontsize": 10,
+    "value_fontsize": 9,
+    "percent_fontsize": 9,
+    "legend_fontsize": 9,
     "show_confidence_intervals": True,
     "baseline_color": "#4c72b0",
     "target_color": "#dd8452",
@@ -49,16 +55,22 @@ DATASET_COMPARISON_PLOT_STYLE = {
         "xlim_min": 0.70,
         "xlim_max": 0.90,
         "xticks": [0.70, 0.75, 0.80, 0.85, 0.90],
-        "figsize": [7.2, 4.2],
-        "point_size": 14,
+        "figsize": [8.6, 5.2],
+        "point_size": 22,
         "line_width": 1.0,
-        "label_offset_y": 0.13,
-        "improvement_offset_y": 0.17,
-        "title_fontsize": 10,
-        "xlabel_fontsize": 8,
-        "ylabel_fontsize": 7,
-        "value_fontsize": 8,
-        "percent_fontsize": 7,
+        "title_pad": 12,
+        "value_offset_points": 8,
+        "improvement_offset_points": 10,
+        "improvement_position": "above",
+        "top_margin": 0.86,
+        "bottom_margin": 0.18,
+        "left_margin": 0.35,
+        "right_margin": 0.97,
+        "title_fontsize": 12,
+        "xlabel_fontsize": 10,
+        "ylabel_fontsize": 10,
+        "value_fontsize": 9,
+        "percent_fontsize": 8,
         "show_confidence_intervals": False,
     }
 }
@@ -200,8 +212,10 @@ def plot_paired_comparison_chart(
     percent_decimals = int(style_cfg["percent_decimals"])
     point_size = float(style_cfg["point_size"])
     line_width = float(style_cfg["line_width"])
-    label_offset_y = float(style_cfg["label_offset_y"])
-    improvement_offset_y = float(style_cfg["improvement_offset_y"])
+    title_pad = float(style_cfg["title_pad"])
+    value_offset_points = float(style_cfg["value_offset_points"])
+    improvement_offset_points = float(style_cfg["improvement_offset_points"])
+    improvement_position = str(style_cfg.get("improvement_position", "above")).lower()
     title_fontsize = float(style_cfg["title_fontsize"])
     xlabel_fontsize = float(style_cfg["xlabel_fontsize"])
     ylabel_fontsize = float(style_cfg["ylabel_fontsize"])
@@ -210,6 +224,10 @@ def plot_paired_comparison_chart(
     legend_fontsize = float(style_cfg["legend_fontsize"])
     show_confidence_intervals = bool(style_cfg["show_confidence_intervals"])
     auto_xlim = bool(style_cfg["auto_xlim"])
+    top_margin = float(style_cfg["top_margin"])
+    bottom_margin = float(style_cfg["bottom_margin"])
+    left_margin = float(style_cfg["left_margin"])
+    right_margin = float(style_cfg["right_margin"])
 
     values = [row["baseline"] for row in rows] + [row["target"] for row in rows]
     if show_confidence_intervals:
@@ -236,6 +254,7 @@ def plot_paired_comparison_chart(
         vmax = float(configured_xlim_max) if configured_xlim_max is not None else data_max + padding
 
     fig, ax = plt.subplots(figsize=tuple(figsize))
+    fig.subplots_adjust(left=left_margin, right=right_margin, top=top_margin, bottom=bottom_margin)
     y_positions = np.arange(len(rows))
 
     for y, row in zip(y_positions, rows):
@@ -270,26 +289,48 @@ def plot_paired_comparison_chart(
         ax.scatter(row["baseline"], y, color=baseline_color, s=point_size, zorder=3)
         ax.scatter(row["target"], y, color=target_color, s=point_size, zorder=3)
 
-        ax.text(row["baseline"], y + label_offset_y, f"{row['baseline']:.{value_decimals}f}", color=baseline_color, fontsize=value_fontsize, ha="center", va="bottom")
-        ax.text(row["target"], y + label_offset_y, f"{row['target']:.{value_decimals}f}", color=target_color, fontsize=value_fontsize, ha="center", va="bottom")
+        ax.annotate(
+            f"{row['baseline']:.{value_decimals}f}",
+            xy=(row["baseline"], y),
+            xytext=(0, -value_offset_points),
+            textcoords="offset points",
+            color=baseline_color,
+            fontsize=value_fontsize,
+            ha="center",
+            va="top",
+        )
+        ax.annotate(
+            f"{row['target']:.{value_decimals}f}",
+            xy=(row["target"], y),
+            xytext=(0, -value_offset_points),
+            textcoords="offset points",
+            color=target_color,
+            fontsize=value_fontsize,
+            ha="center",
+            va="top",
+        )
 
         if np.isfinite(row["improvement"]):
-            ax.text(
-                (row["baseline"] + row["target"]) / 2.0,
-                y - improvement_offset_y,
+            improvement_va = "bottom" if improvement_position == "above" else "top"
+            improvement_dy = improvement_offset_points if improvement_position == "above" else -improvement_offset_points
+            ax.annotate(
                 f"+{row['improvement']:.{percent_decimals}f}%",
+                xy=((row["baseline"] + row["target"]) / 2.0, y),
+                xytext=(0, improvement_dy),
+                textcoords="offset points",
                 color=improvement_color,
                 fontsize=percent_fontsize,
                 fontweight="bold",
                 ha="center",
-                va="center",
+                va=improvement_va,
             )
 
     ax.set_yticks(y_positions)
     ax.set_yticklabels([row["label"] for row in rows], fontsize=ylabel_fontsize)
     ax.invert_yaxis()
+    ax.margins(y=0.12)
     ax.set_xlabel(x_label, fontsize=xlabel_fontsize, fontweight="bold")
-    ax.set_title(title, fontsize=title_fontsize, pad=10)
+    ax.set_title(title, fontsize=title_fontsize, pad=title_pad)
     ax.set_xlim(vmin, vmax)
 
     xticks = style_cfg.get("xticks")
