@@ -7,7 +7,6 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import ListedColormap
 
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("circular_map_config.json")
@@ -16,14 +15,11 @@ DEFAULT_PLOT_STYLE = {
     "start_angle": 55.0,
     "end_angle": 360.0,
     "endspace": False,
-    "sector_spacing": 6.0,
+    "sector_spacing": 12.0,
     "track_outer_radius": 100.0,
-    "track_thickness": 8.0,
+    "track_thickness": 10.0,
     "track_gap": 2.0,
-    "group_ring_thickness": 3.0,
-    "group_ring_gap": 2.0,
     "track_pad_ratio": 0.1,
-    "group_ring_pad_ratio": 0.05,
     "figsize": [12, 12],
     "dpi": 600,
     "cmap": "Purples",
@@ -31,28 +27,25 @@ DEFAULT_PLOT_STYLE = {
     "missing_color": "#E0E0E0",
     "rect_edgecolor": "white",
     "rect_linewidth": 0.3,
-    "label_margin": 2.0,
+    "label_margin": 3.0,
     "label_orientation": "vertical",
-    "group_label_margin": 4.0,
-    "group_label_orientation": "vertical",
     "show_outer_axis": False,
     "metric_title": "Score",
     "colorbar_bounds": [0.84, 0.8, 0.025, 0.2],
     "colorbar_labelpad": 14.0,
     "colorbar_label_rotation": 90.0,
     "model_text_prefix": " ",
-    "model_text_size": 24.0,
+    "model_text_size": 28.0,
     "model_text_ha": "left",
     "model_text_color": "black",
 }
 DEFAULT_FONT_STYLE = {
-    "category": 24,
-    "cbar_title": 24,
-    "cbar_ticks": 24,
-    "legend": 24,
-    "pathology": 24,
+    "category": 28,
+    "cbar_title": 28,
+    "cbar_ticks": 26,
+    "legend": 28,
+    "pathology": 28,
 }
-DEFAULT_CATEGORY_COLORS = {"Datasets": "#5e35b1"}
 DATASET_PLOT_OVERRIDES = {
     "auroc": {
         "vmin": 0.3,
@@ -297,28 +290,6 @@ def build_track_ranges(model_count: int, plot_cfg: Dict[str, Any]) -> List[Tuple
     return track_ranges
 
 
-def build_group_ring_range(track_ranges: Sequence[Tuple[float, float]], plot_cfg: Dict[str, Any]) -> Tuple[float, float]:
-    configured = plot_cfg.get("group_ring_range")
-    if isinstance(configured, list) and len(configured) == 2:
-        return (float(configured[0]), float(configured[1]))
-
-    lowest_inner = min(inner for inner, _ in track_ranges)
-    group_ring_thickness = float(plot_cfg.get("group_ring_thickness", DEFAULT_PLOT_STYLE["group_ring_thickness"]))
-    group_ring_gap = float(plot_cfg.get("group_ring_gap", DEFAULT_PLOT_STYLE["group_ring_gap"]))
-    group_ring_outer = lowest_inner - group_ring_gap
-    group_ring_inner = group_ring_outer - group_ring_thickness
-    return (group_ring_inner, group_ring_outer)
-
-
-def resolve_group_colors(group_names: Sequence[str], category_colors: Dict[str, str], plot_cfg: Dict[str, Any]) -> Dict[str, Any]:
-    fallback_cmap = plt.get_cmap(str(plot_cfg.get("group_cmap", DEFAULT_PLOT_STYLE["group_cmap"])))
-    denominator = max(len(group_names) - 1, 1)
-    return {
-        group_name: category_colors.get(group_name, fallback_cmap(index / denominator))
-        for index, group_name in enumerate(group_names)
-    }
-
-
 def import_circos():
     try:
         from pycirclize import Circos
@@ -332,7 +303,6 @@ def import_circos():
 def plot_circular_heatmap(
     all_metrics: Dict[str, Dict[str, float]],
     category_map: Dict[str, List[str]],
-    category_colors: Dict[str, str],
     label_display: Callable[[str], str],
     model_order: List[str],
     plot_cfg: Dict[str, Any],
@@ -352,17 +322,15 @@ def plot_circular_heatmap(
     sector_labels: Dict[str, List[str]] = {}
     for group_name in group_order:
         labels = [str(label) for label in category_map.get(group_name, []) if label in available_labels]
-        if labels:
-            sector_labels[group_name] = labels
+        for label in labels:
+            sector_labels[label] = [label]
 
     if not sector_labels:
         print("No overlapping labels found between config category_map and loaded metrics.")
         return
 
-    sectors = {group_name: len(labels) for group_name, labels in sector_labels.items()}
+    sectors = {sector_name: len(labels) for sector_name, labels in sector_labels.items()}
     track_ranges = build_track_ranges(len(models), plot_cfg)
-    group_ring_range = build_group_ring_range(track_ranges, plot_cfg)
-    group_colors = resolve_group_colors(list(sector_labels.keys()), category_colors, plot_cfg)
 
     start_angle = float(plot_cfg.get("start_angle", DEFAULT_PLOT_STYLE["start_angle"]))
     end_angle = float(plot_cfg.get("end_angle", DEFAULT_PLOT_STYLE["end_angle"]))
@@ -379,13 +347,10 @@ def plot_circular_heatmap(
     dpi = int(plot_cfg.get("dpi", DEFAULT_PLOT_STYLE["dpi"]))
     figsize = tuple(plot_cfg.get("figsize", DEFAULT_PLOT_STYLE["figsize"]))
     track_pad_ratio = float(plot_cfg.get("track_pad_ratio", DEFAULT_PLOT_STYLE["track_pad_ratio"]))
-    group_ring_pad_ratio = float(plot_cfg.get("group_ring_pad_ratio", DEFAULT_PLOT_STYLE["group_ring_pad_ratio"]))
     rect_edgecolor = str(plot_cfg.get("rect_edgecolor", DEFAULT_PLOT_STYLE["rect_edgecolor"]))
     rect_linewidth = float(plot_cfg.get("rect_linewidth", DEFAULT_PLOT_STYLE["rect_linewidth"]))
     label_margin = float(plot_cfg.get("label_margin", DEFAULT_PLOT_STYLE["label_margin"]))
     label_orientation = str(plot_cfg.get("label_orientation", DEFAULT_PLOT_STYLE["label_orientation"]))
-    group_label_margin = float(plot_cfg.get("group_label_margin", DEFAULT_PLOT_STYLE["group_label_margin"]))
-    group_label_orientation = str(plot_cfg.get("group_label_orientation", DEFAULT_PLOT_STYLE["group_label_orientation"]))
     show_outer_axis = bool(plot_cfg.get("show_outer_axis", DEFAULT_PLOT_STYLE["show_outer_axis"]))
     model_text_prefix = str(plot_cfg.get("model_text_prefix", DEFAULT_PLOT_STYLE["model_text_prefix"]))
     model_text_labels = plot_cfg.get("model_text_labels", {})
@@ -428,23 +393,6 @@ def plot_circular_heatmap(
                 label_orientation=label_orientation,
             )
 
-        group_track = sector.add_track(group_ring_range, r_pad_ratio=group_ring_pad_ratio)
-        group_track.heatmap(
-            [[1] * len(labels)],
-            cmap=ListedColormap([group_colors[sector.name]]),
-            vmin=0,
-            vmax=1,
-            rect_kws={"edgecolor": group_colors[sector.name], "linewidth": 0.0},
-        )
-        sector_mid = (sector.start + sector.end) / 2
-        group_track.xticks(
-            [sector_mid],
-            labels=[sector.name],
-            outer=False,
-            label_size=fonts["category"],
-            label_margin=group_label_margin,
-            label_orientation=group_label_orientation,
-        )
 
     for track_range, model_name in zip(track_ranges, models):
         circos.text(
@@ -544,7 +492,6 @@ def main() -> None:
             plot_circular_heatmap(
                 all_metrics=all_metrics,
                 category_map=dataset_cfg.get("category_map", {}),
-                category_colors=DEFAULT_CATEGORY_COLORS,
                 label_display=make_label_display(dataset_cfg),
                 model_order=model_order,
                 plot_cfg=plot_cfg,
