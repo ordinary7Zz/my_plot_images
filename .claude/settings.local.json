@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python *)"
+      "Bash(python *)",
+      "PowerShell(python -m py_compile \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_from_config.py\")",
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\paired_comparison_from_config.py\")",
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\paired_comparison_from_config.py\" --datasets malignancy_tasks)",
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\nature_big_figure.py\")"
     ]
   }
 }

@@ -4,7 +4,7 @@
   },
   "plot": {
     "model_order": [
-      "ThyroidXAgent",
+      "ThyroidXgent",
       "Baseline"
     ]
   },

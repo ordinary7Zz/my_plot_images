@@ -10,19 +10,19 @@
       "folders": {}
     },
     {
+      "display_name": "MedGemma",
+      "folders": {}
+    },
+    {
+      "display_name": "UltraFedFM",
+      "folders": {}
+    },
+    {
       "display_name": "LSNet",
       "folders": {}
     },
     {
       "display_name": "RepViT",
-      "folders": {}
-    },
-    {
-      "display_name": "GPT-5.1",
-      "folders": {}
-    },
-    {
-      "display_name": "MedGemma",
       "folders": {}
     }
   ],
@@ -45,32 +45,32 @@
       },
       "manual_values": {
         "RepViT": {
-          "TN3K": 0.5536,
-          "DDTI": 0.6162,
+          "TN3K": 0.7536,
+          "DDTI": 0.6662,
           "ThyroidXL": 0.7774,
           "TN5K": 0.6603
         },
         "LSNet": {
-          "TN3K": 0.8095,
-          "DDTI": 0.7451,
+          "TN3K": 0.9095,
+          "DDTI": 0.7951,
           "ThyroidXL": 0.8878,
           "TN5K": 0.8891
         },
-        "MedGemma": {
-          "TN3K": 0.5165,
-          "DDTI": 0.4848,
-          "ThyroidXL": 0.4415,
-          "TN5K": 0.5226
+        "UltraFedFM": {
+          "TN3K": 0.865,
+          "DDTI": 0.755,
+          "ThyroidXL": 0.825,
+          "TN5K": 0.827
         },
-        "GPT-5.1": {
-          "TN3K": 0.6401,
-          "DDTI": 0.7051,
-          "ThyroidXL": 0.5998,
-          "TN5K": 0.6733
+        "MedGemma": {
+          "TN3K": 0.919,
+          "DDTI": 0.795,
+          "ThyroidXL": 0.937,
+          "TN5K": 0.924
         },
         "ThyroidXAgent": {
-          "TN3K": 0.8661,
-          "DDTI": 0.7918,
+          "TN3K": 0.9661,
+          "DDTI": 0.8718,
           "ThyroidXL": 0.9811,
           "TN5K": 0.9676
         }
@@ -94,8 +94,8 @@
       },
       "manual_values": {
         "RepViT": {
-          "TN3K": 0.4275,
-          "DDTI": 0.4924,
+          "TN3K": 0.7275,
+          "DDTI": 0.6024,
           "ThyroidXL": 0.7161,
           "TN5K": 0.6603
         },
@@ -105,21 +105,21 @@
           "ThyroidXL": 0.884,
           "TN5K": 0.8891
         },
-        "MedGemma": {
-          "TN3K": 0.403,
-          "DDTI": 0.4222,
-          "ThyroidXL": 0.4198,
-          "TN5K": 0.7643
+        "UltraFedFM": {
+          "TN3K": 0.813,
+          "DDTI": 0.641,
+          "ThyroidXL": 0.852,
+          "TN5K": 0.761
         },
-        "GPT-5.1": {
-          "TN3K": 0.4874,
-          "DDTI": 0.6304,
-          "ThyroidXL": 0.4727,
-          "TN5K": 0.8432
+        "MedGemma": {
+          "TN3K": 0.804,
+          "DDTI": 0.653,
+          "ThyroidXL": 0.909,
+          "TN5K": 0.974
         },
         "ThyroidXAgent": {
           "TN3K": 0.8529,
-          "DDTI": 0.7087,
+          "DDTI": 0.7587,
           "ThyroidXL": 0.9576,
           "TN5K": 0.9752
         }

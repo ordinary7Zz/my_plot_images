@@ -40,42 +40,44 @@ DEFAULT_PLOT_STYLE = {
     "model_text_color": "black",
 }
 DEFAULT_FONT_STYLE = {
-    "category": 28,
-    "cbar_title": 28,
-    "cbar_ticks": 26,
-    "legend": 28,
-    "pathology": 28,
+    "category": 52, 
+    "cbar_title": 32, # 色条标题
+    "cbar_ticks": 32, # 色条数字
+    "legend": 52, # 模型名
+    "pathology": 32, # 外圈标签
 }
 DATASET_PLOT_OVERRIDES = {
     "auroc": {
-        "vmin": 0.3,
+        "vmin": 0.5,
         "vmax": 1.0,
-        "color_breaks": [0.3, 0.6, 0.8, 1.0],
-        "color_positions": [0.0, 0.3, 0.45, 1.0],
+        "figsize": [14, 14],
+        "color_breaks": [0.5,1.0],
+        "color_positions": [0.0, 1.0],
     },
     "auprc": {
-        "vmin": 0.3,
+        "vmin": 0.5,
         "vmax": 1.0,
-        "color_breaks": [0.3, 0.6, 0.8, 1.0],
-        "color_positions": [0.0, 0.3, 0.45, 1.0],
+        "figsize": [14, 14],
+        "color_breaks": [0.5, 1.0],
+        "color_positions": [0.0, 1.0],
     },
     "dice": {
-        "vmin": 0.0,
+        "vmin": 70.0,
         "vmax": 90.0,
         "figsize": [14, 14],
         "cmap": "PuBu",
-        "color_breaks": [0.0, 60.0, 70.0, 80.0, 90.0],
-        "color_positions": [0.0, 0.2, 0.4, 0.7, 1.0],
+        "color_breaks": [70.0, 75.0, 80.0, 85.0, 90.0],
+        "color_positions": [0.0, 0.25, 0.5, 0.75, 1.0],
     },
     "hd95": {
         "vmin": 5.0,
-        "vmax": 150.0,
+        "vmax": 30.0,
         "figsize": [14, 14],
         "cmap": "PuBu",
         "lower_is_better": True,
         "invert_colorbar": True,
-        "color_breaks": [5.0, 10.0, 20.0, 120.0, 150.0],
-        "color_positions": [0.0, 0.3, 0.6, 0.8, 1.0],
+        "color_breaks": [5.0, 10.0, 15.0, 20.0, 25.0, 30.0],
+        "color_positions": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
     },
 }
 
@@ -428,11 +430,9 @@ def plot_circular_heatmap(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
-    fig.savefig(output_path.with_suffix(".pdf"), dpi=dpi, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved: {output_path}")
-    print(f"Saved: {output_path.with_suffix('.pdf')}")
 
 
 def parse_args() -> argparse.Namespace:

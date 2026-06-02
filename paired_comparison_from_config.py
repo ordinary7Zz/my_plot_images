@@ -13,36 +13,53 @@ DEFAULT_CONFIG_PATH = Path(__file__).with_name("paired_comparison_config.json")
 SUPPORTED_MANUAL_VALUE_KEYS = ("manual_values", "manual_metric_values")
 DEFAULT_COMPARISON_PLOT_STYLE = {
     "file_suffix": "paired_comparison",
-    "x_label": "Performance Score",
+    "x_label": "Performance score",
     "auto_xlim": True,
     "xlim_min": None,
     "xlim_max": None,
     "xticks": None,
     "figsize": None,
     "dpi": 600,
-    "value_decimals": 4,
+    "value_decimals": 3,
     "percent_decimals": 1,
-    "point_size": 34,
-    "line_width": 1.2,
-    "title_pad": 14,
-    "value_offset_points": 10,
-    "improvement_offset_points": 12,
+    "point_size": 22,
+    "line_width": 0.7,
+    "title_pad": 8,
+    "value_offset_points": 5,
+    "improvement_offset_points": 6,
     "improvement_position": "above",
-    "top_margin": 0.90,
-    "bottom_margin": 0.16,
-    "left_margin": 0.32,
-    "right_margin": 0.96,
-    "title_fontsize": 14,
-    "xlabel_fontsize": 11,
-    "ylabel_fontsize": 10,
-    "value_fontsize": 9,
-    "percent_fontsize": 9,
-    "legend_fontsize": 9,
+    "value_label_mode": "target",
+    "show_improvement_labels": True,
+    "show_title": False,
+    "top_margin": 0.93,
+    "bottom_margin": 0.14,
+    "left_margin": 0.25,
+    "right_margin": 0.97,
+    "row_spacing": 1.0,
+    "y_margin": 0.10,
+    "title_fontsize": 10.5,
+    "xlabel_fontsize": 8.5,
+    "ylabel_fontsize": 7.0,
+    "value_fontsize": 10.0,
+    "percent_fontsize": 10.0,
+    "legend_fontsize": 7.0,
+    "xtick_fontsize": 7.5,
+    "grid_alpha": 0.12,
+    "grid_linewidth": 0.45,
     "show_confidence_intervals": True,
-    "baseline_color": "#4c72b0",
-    "target_color": "#dd8452",
-    "line_color": "#a8a8a8",
-    "improvement_color": "#2e7d32",
+    "baseline_color": "#7a8798",
+    "target_color": "#b35c44",
+    "line_color": "#c7c7c7",
+    "improvement_color": "#2f6b3b",
+    "grid_color": "#e7e7e7",
+    "spine_color": "#3b3b3b",
+    "marker_edgecolor": "#ffffff",
+    "marker_edgewidth": 0.5,
+    "tick_length": 2.5,
+    "tick_width": 0.5,
+    "legend_marker_size": 4.8,
+    "label_linespacing": 1.08,
+    "axes_bg_color": "#ffffff",
 }
 DATASET_COMPARISON_PLOT_STYLE = {
     "malignancy_tasks": {
@@ -52,26 +69,46 @@ DATASET_COMPARISON_PLOT_STYLE = {
         "target_label": "ThyroidXAgent",
         "title": "Impact of ThyroidXAgent on Classification Performance",
         "auto_xlim": False,
-        "xlim_min": 0.70,
-        "xlim_max": 0.90,
+        "xlim_min": 0.69,
+        "xlim_max": 0.91,
         "xticks": [0.70, 0.75, 0.80, 0.85, 0.90],
-        "figsize": [8.6, 5.2],
-        "point_size": 22,
-        "line_width": 1.0,
-        "title_pad": 12,
-        "value_offset_points": 8,
-        "improvement_offset_points": 10,
+        "figsize": [6.8, 3.0],
+        "point_size": 26,
+        "line_width": 0.75,
+        "title_pad": 8,
+        "value_offset_points": 5,
+        "improvement_offset_points": 6,
         "improvement_position": "above",
-        "top_margin": 0.86,
-        "bottom_margin": 0.18,
-        "left_margin": 0.35,
+        "value_label_mode": "target",
+        "show_improvement_labels": True,
+        "show_title": False,
+        "top_margin": 0.94,
+        "bottom_margin": 0.13,
+        "left_margin": 0.22,
         "right_margin": 0.97,
-        "title_fontsize": 12,
-        "xlabel_fontsize": 10,
-        "ylabel_fontsize": 10,
-        "value_fontsize": 9,
-        "percent_fontsize": 8,
+        "title_fontsize": 10.5,
+        "xlabel_fontsize": 8.5,
+        "ylabel_fontsize": 8.0,
+        "value_fontsize": 10.0,
+        "percent_fontsize": 10.0,
+        "legend_fontsize": 7.0,
+        "xtick_fontsize": 7.5,
+        "grid_alpha": 0.10,
+        "grid_linewidth": 0.45,
         "show_confidence_intervals": False,
+        "baseline_color": "#7f8894",
+        "target_color": "#b65c46",
+        "line_color": "#c9c9c9",
+        "improvement_color": "#2f6b3b",
+        "grid_color": "#e7e7e7",
+        "spine_color": "#3b3b3b",
+        "marker_edgecolor": "#ffffff",
+        "marker_edgewidth": 0.5,
+        "tick_length": 2.5,
+        "tick_width": 0.5,
+        "legend_marker_size": 4.8,
+        "label_linespacing": 1.08,
+        "axes_bg_color": "#ffffff",
     }
 }
 
@@ -79,6 +116,23 @@ DATASET_COMPARISON_PLOT_STYLE = {
 def load_json(path: Path) -> Dict[str, Any]:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def style_matplotlib() -> None:
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+            "axes.unicode_minus": False,
+            "figure.facecolor": "white",
+            "savefig.facecolor": "white",
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
+            "axes.linewidth": 0.7,
+            "xtick.direction": "out",
+            "ytick.direction": "out",
+        }
+    )
 
 
 def load_manual_metric_values(dataset_cfg: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
@@ -103,21 +157,14 @@ def build_dataset_labels(dataset_cfg: Dict[str, Any]) -> List[str]:
     return [label for labels in category_map.values() for label in labels]
 
 
-def load_manual_confidence_intervals(dataset_cfg: Dict[str, Any]) -> Dict[str, Dict[str, List[float]]]:
-    manual_intervals = dataset_cfg.get("manual_confidence_intervals")
-    if not isinstance(manual_intervals, dict):
-        return {}
-
-    result: Dict[str, Dict[str, List[float]]] = {}
-    for model_name, dataset_intervals in manual_intervals.items():
-        if not isinstance(dataset_intervals, dict):
-            continue
-        result[str(model_name)] = {}
-        for label, interval in dataset_intervals.items():
-            if not isinstance(interval, list) or len(interval) != 2:
-                continue
-            result[str(model_name)][str(label)] = [float(interval[0]), float(interval[1])]
-    return result
+def format_comparison_label(label: str) -> str:
+    parts = [part.strip() for part in str(label).splitlines() if part.strip()]
+    if len(parts) >= 3:
+        head = parts[0]
+        middle = parts[1].rstrip("- ").strip()
+        tail = " · ".join(parts[2:])
+        return f"{head}\n{middle} · {tail}"
+    return "\n".join(parts) if parts else str(label)
 
 
 def plot_paired_comparison_chart(
@@ -216,18 +263,33 @@ def plot_paired_comparison_chart(
     value_offset_points = float(style_cfg["value_offset_points"])
     improvement_offset_points = float(style_cfg["improvement_offset_points"])
     improvement_position = str(style_cfg.get("improvement_position", "above")).lower()
+    value_label_mode = str(style_cfg.get("value_label_mode", "both")).lower()
+    show_improvement_labels = bool(style_cfg.get("show_improvement_labels", True))
+    show_title = bool(style_cfg.get("show_title", True))
     title_fontsize = float(style_cfg["title_fontsize"])
     xlabel_fontsize = float(style_cfg["xlabel_fontsize"])
     ylabel_fontsize = float(style_cfg["ylabel_fontsize"])
     value_fontsize = float(style_cfg["value_fontsize"])
     percent_fontsize = float(style_cfg["percent_fontsize"])
     legend_fontsize = float(style_cfg["legend_fontsize"])
+    xtick_fontsize = float(style_cfg["xtick_fontsize"])
     show_confidence_intervals = bool(style_cfg["show_confidence_intervals"])
     auto_xlim = bool(style_cfg["auto_xlim"])
     top_margin = float(style_cfg["top_margin"])
     bottom_margin = float(style_cfg["bottom_margin"])
     left_margin = float(style_cfg["left_margin"])
     right_margin = float(style_cfg["right_margin"])
+    grid_alpha = float(style_cfg["grid_alpha"])
+    grid_linewidth = float(style_cfg["grid_linewidth"])
+    grid_color = str(style_cfg.get("grid_color", "#e6e6e6"))
+    spine_color = str(style_cfg.get("spine_color", "#3b3b3b"))
+    marker_edgecolor = str(style_cfg.get("marker_edgecolor", "#ffffff"))
+    marker_edgewidth = float(style_cfg.get("marker_edgewidth", 0.6))
+    tick_length = float(style_cfg.get("tick_length", 3.0))
+    tick_width = float(style_cfg.get("tick_width", 0.6))
+    legend_marker_size = float(style_cfg.get("legend_marker_size", 5.5))
+    label_linespacing = float(style_cfg.get("label_linespacing", 1.0))
+    axes_bg_color = str(style_cfg.get("axes_bg_color", "#ffffff"))
 
     values = [row["baseline"] for row in rows] + [row["target"] for row in rows]
     if show_confidence_intervals:
@@ -254,6 +316,7 @@ def plot_paired_comparison_chart(
         vmax = float(configured_xlim_max) if configured_xlim_max is not None else data_max + padding
 
     fig, ax = plt.subplots(figsize=tuple(figsize))
+    ax.set_facecolor(axes_bg_color)
     fig.subplots_adjust(left=left_margin, right=right_margin, top=top_margin, bottom=bottom_margin)
     y_positions = np.arange(len(rows))
 
@@ -286,31 +349,49 @@ def plot_paired_comparison_chart(
                 zorder=2,
             )
 
-        ax.scatter(row["baseline"], y, color=baseline_color, s=point_size, zorder=3)
-        ax.scatter(row["target"], y, color=target_color, s=point_size, zorder=3)
-
-        ax.annotate(
-            f"{row['baseline']:.{value_decimals}f}",
-            xy=(row["baseline"], y),
-            xytext=(0, -value_offset_points),
-            textcoords="offset points",
+        ax.scatter(
+            row["baseline"],
+            y,
             color=baseline_color,
-            fontsize=value_fontsize,
-            ha="center",
-            va="top",
+            s=point_size,
+            edgecolors=marker_edgecolor,
+            linewidths=marker_edgewidth,
+            zorder=3,
         )
-        ax.annotate(
-            f"{row['target']:.{value_decimals}f}",
-            xy=(row["target"], y),
-            xytext=(0, -value_offset_points),
-            textcoords="offset points",
+        ax.scatter(
+            row["target"],
+            y,
             color=target_color,
-            fontsize=value_fontsize,
-            ha="center",
-            va="top",
+            s=point_size,
+            edgecolors=marker_edgecolor,
+            linewidths=marker_edgewidth,
+            zorder=3,
         )
 
-        if np.isfinite(row["improvement"]):
+        if value_label_mode in {"both", "baseline"}:
+            ax.annotate(
+                f"{row['baseline']:.{value_decimals}f}",
+                xy=(row["baseline"], y),
+                xytext=(0, -value_offset_points),
+                textcoords="offset points",
+                color=baseline_color,
+                fontsize=value_fontsize,
+                ha="center",
+                va="top",
+            )
+        if value_label_mode in {"both", "target"}:
+            ax.annotate(
+                f"{row['target']:.{value_decimals}f}",
+                xy=(row["target"], y),
+                xytext=(0, -value_offset_points),
+                textcoords="offset points",
+                color=target_color,
+                fontsize=value_fontsize,
+                ha="center",
+                va="top",
+            )
+
+        if show_improvement_labels and np.isfinite(row["improvement"]):
             improvement_va = "bottom" if improvement_position == "above" else "top"
             improvement_dy = improvement_offset_points if improvement_position == "above" else -improvement_offset_points
             ax.annotate(
@@ -320,44 +401,50 @@ def plot_paired_comparison_chart(
                 textcoords="offset points",
                 color=improvement_color,
                 fontsize=percent_fontsize,
-                fontweight="bold",
+                fontweight="normal",
                 ha="center",
                 va=improvement_va,
             )
 
     ax.set_yticks(y_positions)
-    ax.set_yticklabels([row["label"] for row in rows], fontsize=ylabel_fontsize)
+    formatted_labels = [format_comparison_label(row["label"]) for row in rows]
+    ax.set_yticklabels(formatted_labels, fontsize=ylabel_fontsize)
+    for tick_label in ax.get_yticklabels():
+        tick_label.set_linespacing(label_linespacing)
+        tick_label.set_horizontalalignment("right")
     ax.invert_yaxis()
-    ax.margins(y=0.12)
-    ax.set_xlabel(x_label, fontsize=xlabel_fontsize, fontweight="bold")
-    ax.set_title(title, fontsize=title_fontsize, pad=title_pad)
+    ax.margins(y=0.10)
+    ax.set_xlabel(x_label, fontsize=xlabel_fontsize, fontweight="normal")
+    if show_title:
+        ax.set_title(title, fontsize=title_fontsize, pad=title_pad)
     ax.set_xlim(vmin, vmax)
 
     xticks = style_cfg.get("xticks")
     if not auto_xlim and isinstance(xticks, list) and xticks:
         ax.set_xticks([float(value) for value in xticks])
 
-    ax.grid(axis="x", linestyle="--", alpha=0.25)
+    ax.grid(axis="x", linestyle=":", alpha=grid_alpha, linewidth=grid_linewidth, color=grid_color)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_visible(False)
-    ax.tick_params(axis="y", length=0)
+    ax.spines["bottom"].set_linewidth(0.7)
+    ax.spines["bottom"].set_color(spine_color)
+    ax.tick_params(axis="x", labelsize=xtick_fontsize, width=tick_width, length=tick_length, color=spine_color)
+    ax.tick_params(axis="y", length=0, pad=6)
 
     legend_handles = [
-        Line2D([0], [0], marker="o", color="none", markerfacecolor=baseline_color, markersize=6, label=baseline_label),
-        Line2D([0], [0], marker="o", color="none", markerfacecolor=target_color, markersize=6, label=target_label),
+        Line2D([0], [0], marker="o", color="none", markerfacecolor=baseline_color, markeredgecolor=marker_edgecolor, markeredgewidth=marker_edgewidth, markersize=legend_marker_size, label=baseline_label),
+        Line2D([0], [0], marker="o", color="none", markerfacecolor=target_color, markeredgecolor=marker_edgecolor, markeredgewidth=marker_edgewidth, markersize=legend_marker_size, label=target_label),
     ]
-    ax.legend(handles=legend_handles, loc="upper right", frameon=False, fontsize=legend_fontsize)
+    ax.legend(handles=legend_handles, loc="upper right", frameon=False, fontsize=legend_fontsize, handletextpad=0.5, borderaxespad=0.2)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     file_slug = dataset_cfg.get("file_slug", metric_name)
     output_png = output_dir / f"{file_slug}_{file_suffix}.png"
     fig.savefig(output_png, dpi=dpi, bbox_inches="tight")
-    fig.savefig(output_png.with_suffix(".pdf"), dpi=dpi, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved: {output_png}")
-    print(f"Saved: {output_png.with_suffix('.pdf')}")
 
 
 def parse_args(dataset_keys: List[str]) -> argparse.Namespace:
@@ -380,6 +467,7 @@ def main() -> None:
     if args.config != DEFAULT_CONFIG_PATH:
         cfg = load_json(args.config)
 
+    style_matplotlib()
     output_dir = args.output_dir or Path(cfg["paths"]["default_output_dir"])
     target_datasets = args.datasets if args.datasets else list(cfg.get("default_datasets", []))
     model_order = list(cfg.get("plot", {}).get("model_order", []))
