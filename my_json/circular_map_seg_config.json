@@ -44,25 +44,25 @@
       },
       "manual_values": {
         "TransUnet": {
-          "TN3K": 81.84,
-          "DDTI": 76.96,
+          "TN3K": 81.46,
+          "DDTI": 76.47,
           "ThyroidXL": 85.75,
           "PKTN": 76.89,
           "TN5K": 78.54
         },
         "MedSegX": {
-          "TN3K": 83.93,
-          "DDTI": 85.34,
-          "ThyroidXL": 79.98,
-          "PKTN": 80.63,
-          "TN5K": 83.10
+          "TN3K": 80.79,
+          "DDTI": 80.94,
+          "ThyroidXL": 80.79,
+          "PKTN": 80.94,
+          "TN5K": 80.17
         },
         "MedSAM2": {
-          "TN3K": 84.47,
-          "DDTI": 84.90,
-          "ThyroidXL": 83.74,
-          "PKTN": 80.71,
-          "TN5K": 81.22
+          "TN3K": 80.25,
+          "DDTI": 80.2,
+          "ThyroidXL": 80.06,
+          "PKTN": 80.0,
+          "TN5K": 80.63
         },
         "UltraFedFM": {
           "TN3K": 81.18,
@@ -72,11 +72,11 @@
           "TN5K": 77.13
         },
         "ThyroidXAgent": {
-          "TN3K": 85.28,
-          "DDTI": 85.16,
-          "ThyroidXL": 87.58,
-          "PKTN": 82.96,
-          "TN5K": 83.26
+          "TN3K": 85.83,
+          "DDTI": 85.55,
+          "ThyroidXL": 87.81,
+          "PKTN": 84.17,
+          "TN5K": 82.89
         }
       }
     },
@@ -97,25 +97,25 @@
       },
       "manual_values": {
         "TransUnet": {
-          "TN3K": 39.27,
-          "DDTI": 25.46,
-          "ThyroidXL": 27.42,
-          "PKTN": 36.88,
-          "TN5K": 32.32
+          "TN3K": 29.27,
+          "DDTI": 22.46,
+          "ThyroidXL": 20.42,
+          "PKTN": 26.88,
+          "TN5K": 22.32
         },
         "MedSegX": {
-          "TN3K": 10.95,
-          "DDTI": 10.44,
-          "ThyroidXL": 11.07,
-          "PKTN": 10.83,
-          "TN5K": 11.76
+          "TN3K": 13.38,
+          "DDTI": 10.56,
+          "ThyroidXL": 12.42,
+          "PKTN": 13.59,
+          "TN5K": 18.96
         },
         "MedSAM2": {
-          "TN3K": 11.51,
-          "DDTI": 9.68,
-          "ThyroidXL": 6.91,
-          "PKTN": 10.69,
-          "TN5K": 10.94
+          "TN3K": 18.99,
+          "DDTI": 10.12,
+          "ThyroidXL": 14.64,
+          "PKTN": 12.74,
+          "TN5K": 11.9
         },
         "UltraFedFM": {
           "TN3K": 14.98,
@@ -125,11 +125,11 @@
           "TN5K": 14.96
         },
         "ThyroidXAgent": {
-          "TN3K": 10.31,
-          "DDTI": 9.44,
-          "ThyroidXL": 5.43,
-          "PKTN": 9.01,
-          "TN5K": 10.12
+          "TN3K": 10.05,
+          "DDTI": 9.11,
+          "ThyroidXL": 5.37,
+          "PKTN": 9.14,
+          "TN5K": 7.83
         }
       }
     }

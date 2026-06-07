@@ -12,106 +12,55 @@ from matplotlib.lines import Line2D
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("paired_comparison_config.json")
 SUPPORTED_MANUAL_VALUE_KEYS = ("manual_values", "manual_metric_values")
 DEFAULT_COMPARISON_PLOT_STYLE = {
-    "file_suffix": "paired_comparison",
-    "x_label": "Performance score",
-    "auto_xlim": True,
-    "xlim_min": None,
-    "xlim_max": None,
-    "xticks": None,
-    "figsize": None,
-    "dpi": 600,
-    "value_decimals": 3,
-    "percent_decimals": 1,
-    "point_size": 22,
-    "line_width": 0.7,
-    "title_pad": 8,
-    "value_offset_points": 5,
-    "improvement_offset_points": 6,
-    "improvement_position": "above",
-    "value_label_mode": "target",
-    "show_improvement_labels": True,
-    "show_title": False,
-    "top_margin": 0.93,
-    "bottom_margin": 0.14,
-    "left_margin": 0.25,
-    "right_margin": 0.97,
-    "row_spacing": 1.0,
-    "y_margin": 0.10,
-    "title_fontsize": 10.5,
-    "xlabel_fontsize": 8.5,
-    "ylabel_fontsize": 7.0,
-    "value_fontsize": 10.0,
-    "percent_fontsize": 10.0,
-    "legend_fontsize": 7.0,
-    "xtick_fontsize": 7.5,
-    "grid_alpha": 0.12,
-    "grid_linewidth": 0.45,
-    "show_confidence_intervals": True,
-    "baseline_color": "#7a8798",
-    "target_color": "#b35c44",
-    "line_color": "#c7c7c7",
-    "improvement_color": "#2f6b3b",
-    "grid_color": "#e7e7e7",
-    "spine_color": "#3b3b3b",
-    "marker_edgecolor": "#ffffff",
-    "marker_edgewidth": 0.5,
-    "tick_length": 2.5,
-    "tick_width": 0.5,
-    "legend_marker_size": 4.8,
-    "label_linespacing": 1.08,
-    "axes_bg_color": "#ffffff",
+    "file_suffix": "paired_comparison",  # 输出文件名后缀
+    "x_label": "Performance score",  # X 轴标题文本
+    "auto_xlim": False,  # 是否根据数据自动计算 X 轴范围
+    "xlim_min": None,  # X 轴下限；auto_xlim=False 时可手动指定
+    "xlim_max": None,  # X 轴上限；auto_xlim=False 时可手动指定
+    "xticks": [0.70, 0.75, 0.80, 0.85, 0.90],  # X 轴刻度位置
+    "figsize": None,  # 图像尺寸（宽, 高）
+    "dpi": 800,  # 保存图片的分辨率
+    "value_decimals": 3,  # baseline / target 数值保留的小数位数
+    "percent_decimals": 1,  # 提升百分比保留的小数位数
+    "point_size": 50,  # 散点大小
+    "line_width": 0.7,  # baseline 与 target 之间连线的线宽
+    "title_pad": 8,  # 标题与绘图区之间的间距
+    "value_offset_points": 5,  # 数值标签相对散点的垂直偏移（单位：points）
+    "improvement_offset_points": 6,  # 提升百分比标签相对中点的垂直偏移（单位：points）
+    "improvement_position": "above",  # 提升百分比标签显示在连线上方还是下方
+    "value_label_mode": "target",  # 数值标签显示模式：target / baseline / both
+    "show_improvement_labels": True,  # 是否显示提升百分比标签
+    "show_title": False,  # 是否显示标题
+    "top_margin": 0.93,  # 子图上边距
+    "bottom_margin": 0.14,  # 子图下边距
+    "left_margin": 0.25,  # 子图左边距
+    "right_margin": 0.97,  # 子图右边距
+    "row_spacing": 1.0,  # 行之间的间距系数
+    "y_margin": 0.10,  # Y 方向留白比例
+    "title_fontsize": 10.5,  # 图标题字号（仅 show_title=True 时生效）
+    "xlabel_fontsize": 15,  # X 轴标题字号
+    "ylabel_fontsize": 15,  # Y 轴分类标签字号
+    "value_fontsize": 15.0,  # baseline / target 数值标签字号
+    "percent_fontsize": 15.0,  # 提升百分比标签字号
+    "legend_fontsize": 15.0,  # 图例字号
+    "xtick_fontsize": 15,  # X 轴刻度数字字号
+    "grid_alpha": 0.12,  # 网格线透明度
+    "grid_linewidth": 0.45,  # 网格线宽度
+    "show_confidence_intervals": True,  # 是否显示置信区间
+    "baseline_color": "#7a8798",  # baseline 点和标签颜色
+    "target_color": "#b35c44",  # target 点和标签颜色
+    "line_color": "#c7c7c7",  # baseline 与 target 之间连线颜色
+    "improvement_color": "#2f6b3b",  # 提升百分比标签颜色
+    "grid_color": "#e7e7e7",  # 网格线颜色
+    "spine_color": "#3b3b3b",  # 坐标轴边框颜色
+    "marker_edgecolor": "#ffffff",  # 散点描边颜色
+    "marker_edgewidth": 0.5,  # 散点描边宽度
+    "tick_length": 2.5,  # 刻度线长度
+    "tick_width": 0.5,  # 刻度线宽度
+    "legend_marker_size": 8,  # 图例圆点大小
+    "label_linespacing": 1.08,  # Y 轴多行标签的行距
+    "axes_bg_color": "#ffffff",  # 坐标轴背景色
 }
-DATASET_COMPARISON_PLOT_STYLE = {
-    "malignancy_tasks": {
-        "baseline_model": "Baseline",
-        "target_model": "ThyroidXAgent",
-        "baseline_label": "Baseline",
-        "target_label": "ThyroidXAgent",
-        "title": "Impact of ThyroidXAgent on Classification Performance",
-        "auto_xlim": False,
-        "xlim_min": 0.69,
-        "xlim_max": 0.91,
-        "xticks": [0.70, 0.75, 0.80, 0.85, 0.90],
-        "figsize": [6.8, 3.0],
-        "point_size": 26,
-        "line_width": 0.75,
-        "title_pad": 8,
-        "value_offset_points": 5,
-        "improvement_offset_points": 6,
-        "improvement_position": "above",
-        "value_label_mode": "target",
-        "show_improvement_labels": True,
-        "show_title": False,
-        "top_margin": 0.94,
-        "bottom_margin": 0.13,
-        "left_margin": 0.22,
-        "right_margin": 0.97,
-        "title_fontsize": 10.5,
-        "xlabel_fontsize": 8.5,
-        "ylabel_fontsize": 8.0,
-        "value_fontsize": 10.0,
-        "percent_fontsize": 10.0,
-        "legend_fontsize": 7.0,
-        "xtick_fontsize": 7.5,
-        "grid_alpha": 0.10,
-        "grid_linewidth": 0.45,
-        "show_confidence_intervals": False,
-        "baseline_color": "#7f8894",
-        "target_color": "#b65c46",
-        "line_color": "#c9c9c9",
-        "improvement_color": "#2f6b3b",
-        "grid_color": "#e7e7e7",
-        "spine_color": "#3b3b3b",
-        "marker_edgecolor": "#ffffff",
-        "marker_edgewidth": 0.5,
-        "tick_length": 2.5,
-        "tick_width": 0.5,
-        "legend_marker_size": 4.8,
-        "label_linespacing": 1.08,
-        "axes_bg_color": "#ffffff",
-    }
-}
-
 
 def load_json(path: Path) -> Dict[str, Any]:
     with open(path, encoding="utf-8") as f:
@@ -174,10 +123,7 @@ def plot_paired_comparison_chart(
     output_dir: Path,
 ) -> None:
     comparison_cfg = dataset_cfg.get("comparison_plot", {})
-    style_cfg = {
-        **DEFAULT_COMPARISON_PLOT_STYLE,
-        **DATASET_COMPARISON_PLOT_STYLE.get(metric_name, {}),
-    }
+    style_cfg = dict(DEFAULT_COMPARISON_PLOT_STYLE)
     custom_rows = comparison_cfg.get("rows")
     baseline_model = str(style_cfg.get("baseline_model", model_order[1] if len(model_order) > 1 else model_order[0]))
     target_model = str(style_cfg.get("target_model", model_order[0]))

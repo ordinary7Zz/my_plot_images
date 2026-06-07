@@ -43,7 +43,7 @@ DEFAULT_FONT_STYLE = {
     "category": 52, 
     "cbar_title": 32, # 色条标题
     "cbar_ticks": 32, # 色条数字
-    "legend": 52, # 模型名
+    "legend": 42, # 模型名
     "pathology": 32, # 外圈标签
 }
 DATASET_PLOT_OVERRIDES = {
@@ -55,10 +55,10 @@ DATASET_PLOT_OVERRIDES = {
         "color_positions": [0.0, 1.0],
     },
     "auprc": {
-        "vmin": 0.5,
+        "vmin": 0.3,
         "vmax": 1.0,
         "figsize": [14, 14],
-        "color_breaks": [0.5, 1.0],
+        "color_breaks": [0.3, 1.0],
         "color_positions": [0.0, 1.0],
     },
     "dice": {

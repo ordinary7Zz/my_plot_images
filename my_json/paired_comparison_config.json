@@ -1,0 +1,44 @@
+{
+  "paths": {
+    "default_output_dir": "D:/workspace/ThyroidAgent/plot_images/out"
+  },
+  "plot": {
+    "model_order": [
+      "ThyroidXgent",
+      "Baseline"
+    ]
+  },
+  "datasets": {
+    "malignancy_tasks": {
+      "file_slug": "malignancy_tasks",
+      "metric_title": "Classification",
+      "comparison_plot": {
+        "rows": [
+          {
+            "label": "Subtype Classification\n(Tiger-Model)-\nAUPRC",
+            "baseline": 0.7117,
+            "target": 0.7863
+          },
+          {
+            "label": "Subtype Classification\n(Tiger-Model)-\nAUROC",
+            "baseline": 0.7136,
+            "target": 0.8053
+          },
+          {
+            "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUPRC",
+            "baseline": 0.7363,
+            "target": 0.8808
+          },
+          {
+            "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUROC",
+            "baseline": 0.7665,
+            "target": 0.8642
+          }
+        ]
+      }
+    }
+  },
+  "default_datasets": [
+    "malignancy_tasks"
+  ]
+}
