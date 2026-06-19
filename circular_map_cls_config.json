@@ -37,11 +37,11 @@
       ],
       "category_map": {
         "Datasets": [
-          "ThyroidXL",
-          "TN3K",
-          "TN5K",
+          "FinalData",
           "DDTI",
-          "FinalData"
+          "ThyroidXL",
+          "TN5K",
+          "TN3K"
         ]
       },
       "manual_values": {
@@ -92,11 +92,11 @@
       ],
       "category_map": {
         "Datasets": [
-          "ThyroidXL",
+          "FinalData",
           "DDTI",
-          "TN3K",
+          "ThyroidXL",
           "TN5K",
-          "FinalData"
+          "TN3K"
         ]
       },
       "manual_values": {

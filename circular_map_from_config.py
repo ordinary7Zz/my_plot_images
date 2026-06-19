@@ -443,12 +443,13 @@ def plot_circular_heatmap(
             colorbar.ax.tick_params(length=0)
 
     fig = circos.plotfig(dpi=dpi, figsize=figsize)
+    fig.patch.set_alpha(0.0)
     add_colorbar(fig, include_labels=False)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_svg = output_path.with_suffix(".svg")
     output_svg_with_text = output_path.with_name(f"{output_path.stem}_with_text.svg")
-    fig.savefig(output_svg, format="svg", bbox_inches="tight")
+    fig.savefig(output_svg, format="svg", bbox_inches="tight", transparent=True)
     plt.close(fig)
 
     for outer_track, labels in sector_outer_tracks:
@@ -475,14 +476,15 @@ def plot_circular_heatmap(
         )
 
     fig = circos.plotfig(dpi=dpi, figsize=figsize)
+    fig.patch.set_alpha(0.0)
     add_colorbar(fig, include_labels=True)
 
     previous_svg_fonttype = plt.rcParams.get("svg.fonttype")
     plt.rcParams["svg.fonttype"] = "none"
-    fig.savefig(output_svg_with_text, format="svg", bbox_inches="tight")
+    fig.savefig(output_svg_with_text, format="svg", bbox_inches="tight", transparent=True)
     if previous_svg_fonttype is not None:
         plt.rcParams["svg.fonttype"] = previous_svg_fonttype
-    fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
+    fig.savefig(output_path, dpi=dpi, bbox_inches="tight", transparent=True)
     plt.close(fig)
 
     print(f"Saved: {output_path}")

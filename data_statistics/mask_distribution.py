@@ -21,11 +21,27 @@ from tqdm import tqdm
 
 
 # ======================== 用户输入区域 ========================
-# 数据集名称
-dataset_name = "Augtrain"
+# 数据集名称列表（与 mask_dirs 一一对应）
+dataset_names = [
+    "Augtrain",
+    "FinalData",
+    "TN3K",
+    "TN5K",
+    "PKTN",
+    "ThyroidXL",
+    "DDTI",
+]
 
-# 掩码文件夹路径（支持 png, jpg, bmp, tif 等常见格式）
-mask_dir = "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask"
+# 掩码文件夹路径列表（支持 png, jpg, bmp, tif 等常见格式）
+mask_dirs = [
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/finall_data/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN3K/train/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/PKTN/train/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/mask",
+]
 
 # 输出根目录（默认为当前脚本所在目录）
 output_root = os.path.dirname(os.path.abspath(__file__))
@@ -156,6 +172,32 @@ def plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir, save_svg=Tr
         plt.close(fig)
         print(f"位置分布 SVG (无文字) 已保存: {svg_path}")
     
+    # ==================== SVG（仅刻度值）====================
+    if save_svg:
+        fig, ax = plt.subplots(figsize=figsize_position)
+        
+        # 绘制填充等高线图
+        ax.contourf(X, Y, Z, levels=15, cmap=position_cmap)
+        
+        # 设置范围
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_aspect('equal')
+        
+        # 设置刻度值（只保留刻度数字，不加标题和轴标签）
+        ax.set_xticks(np.arange(0, 1.1, 0.2))
+        ax.set_yticks(np.arange(0, 1.1, 0.2))
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_title('')
+        ax.tick_params(axis='both', labelsize=10)
+        
+        plt.tight_layout()
+        svg_path = os.path.join(output_dir, "position_with_ticks.svg")
+        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
+        plt.close(fig)
+        print(f"位置分布 SVG (仅刻度值) 已保存: {svg_path}")
+    
     # ==================== PNG（完整文字）====================
     if save_png:
         fig, ax = plt.subplots(figsize=figsize_position)
@@ -222,6 +264,30 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
         plt.close(fig)
         print(f"尺寸分布 SVG (无文字) 已保存: {svg_path}")
     
+    # ==================== SVG（仅刻度值）====================
+    if save_svg:
+        fig, ax = plt.subplots(figsize=figsize_size)
+        
+        # 绘制 KDE 曲线和填充
+        ax.plot(x_range, density, color=size_edge_color, linewidth=1.5)
+        ax.fill_between(x_range, density, alpha=0.4, color=size_color)
+        
+        # 设置范围
+        ax.set_xlim(0, x_range[-1])
+        ax.set_ylim(0, None)
+        
+        # 设置刻度值（只保留刻度数字，不加标题和轴标签）
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_title('')
+        ax.tick_params(axis='both', labelsize=10)
+        
+        plt.tight_layout()
+        svg_path = os.path.join(output_dir, "size_with_ticks.svg")
+        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
+        plt.close(fig)
+        print(f"尺寸分布 SVG (仅刻度值) 已保存: {svg_path}")
+    
     # ==================== PNG（完整文字）====================
     if save_png:
         fig, ax = plt.subplots(figsize=figsize_size)
@@ -251,44 +317,61 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
 
 def main():
     """主函数"""
-    # 创建输出目录
-    output_dir = os.path.join(output_root, dataset_name)
-    os.makedirs(output_dir, exist_ok=True)
+    # 检查数据集名称和路径数量是否一致
+    assert len(dataset_names) == len(mask_dirs), \
+        f"dataset_names ({len(dataset_names)}) 和 mask_dirs ({len(mask_dirs)}) 数量不一致！"
     
-    print(f"数据集: {dataset_name}")
-    print(f"掩码目录: {mask_dir}")
-    print(f"输出目录: {output_dir}")
-    print("-" * 50)
+    print(f"共 {len(dataset_names)} 个数据集待处理")
+    print("=" * 60)
     
-    # 统计掩码信息
-    pos_x, pos_y, rel_sizes = collect_mask_stats(mask_dir)
-    n_samples = len(pos_x)
+    for idx, (dataset_name, mask_dir) in enumerate(zip(dataset_names, mask_dirs)):
+        print(f"\n[{idx + 1}/{len(dataset_names)}] 处理数据集: {dataset_name}")
+        print(f"掩码目录: {mask_dir}")
+        
+        # 创建输出目录
+        output_dir = os.path.join(output_root, dataset_name)
+        os.makedirs(output_dir, exist_ok=True)
+        print(f"输出目录: {output_dir}")
+        print("-" * 50)
+        
+        # 统计掩码信息
+        try:
+            pos_x, pos_y, rel_sizes = collect_mask_stats(mask_dir)
+        except FileNotFoundError as e:
+            print(f"跳过: {e}")
+            continue
+        
+        n_samples = len(pos_x)
+        
+        if n_samples == 0:
+            print("警告：没有有效的掩码数据，跳过该数据集！")
+            continue
+        
+        print(f"\n统计完成，共 {n_samples} 个有效掩码")
+        print(f"位置 X: mean={pos_x.mean():.3f}, std={pos_x.std():.3f}")
+        print(f"位置 Y: mean={pos_y.mean():.3f}, std={pos_y.std():.3f}")
+        print(f"相对尺寸: mean={rel_sizes.mean():.4f}, std={rel_sizes.std():.4f}, "
+              f"min={rel_sizes.min():.4f}, max={rel_sizes.max():.4f}")
+        print("-" * 50)
+        
+        # 绘制位置分布图
+        print("\n绘制位置分布图...")
+        plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir)
+        
+        # 绘制尺寸分布图
+        print("\n绘制尺寸分布图...")
+        plot_size(rel_sizes, dataset_name, n_samples, output_dir)
+        
+        print(f"\n数据集 [{dataset_name}] 完成！输出文件：")
+        print(f"  - {os.path.join(output_dir, 'position.svg')} (无文字)")
+        print(f"  - {os.path.join(output_dir, 'position_with_ticks.svg')} (仅刻度值)")
+        print(f"  - {os.path.join(output_dir, 'position.png')} (完整)")
+        print(f"  - {os.path.join(output_dir, 'size.svg')} (无文字)")
+        print(f"  - {os.path.join(output_dir, 'size_with_ticks.svg')} (仅刻度值)")
+        print(f"  - {os.path.join(output_dir, 'size.png')} (完整)")
     
-    if n_samples == 0:
-        print("错误：没有有效的掩码数据！")
-        return
-    
-    print(f"\n统计完成，共 {n_samples} 个有效掩码")
-    print(f"位置 X: mean={pos_x.mean():.3f}, std={pos_x.std():.3f}")
-    print(f"位置 Y: mean={pos_y.mean():.3f}, std={pos_y.std():.3f}")
-    print(f"相对尺寸: mean={rel_sizes.mean():.4f}, std={rel_sizes.std():.4f}, "
-          f"min={rel_sizes.min():.4f}, max={rel_sizes.max():.4f}")
-    print("-" * 50)
-    
-    # 绘制位置分布图
-    print("\n绘制位置分布图...")
-    plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir)
-    
-    # 绘制尺寸分布图
-    print("\n绘制尺寸分布图...")
-    plot_size(rel_sizes, dataset_name, n_samples, output_dir)
-    
-    print("\n全部完成！")
-    print(f"输出文件：")
-    print(f"  - {os.path.join(output_dir, 'position.svg')} (无文字)")
-    print(f"  - {os.path.join(output_dir, 'position.png')} (完整)")
-    print(f"  - {os.path.join(output_dir, 'size.svg')} (无文字)")
-    print(f"  - {os.path.join(output_dir, 'size.png')} (完整)")
+    print("\n" + "=" * 60)
+    print(f"全部 {len(dataset_names)} 个数据集处理完成！")
 
 
 if __name__ == "__main__":
