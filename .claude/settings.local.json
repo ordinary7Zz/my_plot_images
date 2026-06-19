@@ -5,7 +5,18 @@
       "PowerShell(python -m py_compile \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_from_config.py\")",
       "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\paired_comparison_from_config.py\")",
       "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\paired_comparison_from_config.py\" --datasets malignancy_tasks)",
-      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\nature_big_figure.py\")"
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\nature_big_figure.py\")",
+      "PowerShell(python -c \"import inspect; from pycirclize import Circos; print\\('Circos.text', inspect.signature\\(Circos.text\\)\\); print\\(inspect.getsource\\(Circos.text\\)\\)\")",
+      "PowerShell(python -c \"import inspect; from pycirclize import Track; print\\('Track.xticks', inspect.signature\\(Track.xticks\\)\\); print\\(inspect.getsource\\(Track.xticks\\)\\)\")",
+      "PowerShell(python -c \"import inspect; from pycirclize.track import Track; print\\('Track.xticks', inspect.signature\\(Track.xticks\\)\\); print\\(inspect.getsource\\(Track.xticks\\)\\)\")",
+      "PowerShell(python -c \"import sys; from pathlib import Path; sys.path.insert\\(0, r'D:\\\\workspace\\\\ThyroidAgent\\\\plot_images'\\); from circular_map_from_config import plot_circular_heatmap; all_metrics={'Model A': {'A': 0.8, 'B': 0.7}, 'Model B': {'A': 0.6, 'B': 0.9}, 'Model C': {'A': 0.75, 'B': 0.65}}; category_map={'group1': ['A'], 'group2': ['B']}; plot_cfg={'start_angle': 55, 'end_angle': 360, 'track_outer_radius': 100, 'track_gap': 2, 'track_inner_radius': 0, 'figsize': [8, 8], 'dpi': 150}; output_path=Path\\(r'D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\_tmp_circular_test.png'\\); plot_circular_heatmap\\(all_metrics=all_metrics, category_map=category_map, label_display=lambda x: x, model_order=['Model A', 'Model B', 'Model C'], plot_cfg=plot_cfg, fonts={'legend': 12, 'pathology': 10, 'cbar_title': 10, 'cbar_ticks': 10, 'category': 10}, output_path=output_path, metric_title='Score', group_order=['group1', 'group2']\\); print\\(output_path\\)\")",
+      "PowerShell(python -c \"import inspect; from pycirclize import utils; print\\(inspect.getsource\\(utils.plot.get_label_params_by_rad\\)\\)\")",
+      "PowerShell(python -c \"import inspect; from pycirclize import Circos; print\\(inspect.signature\\(Circos.text\\)\\)\")",
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_from_config.py\" --config \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_cls_config.json\" --datasets auroc)",
+      "PowerShell(python -c \"from pycirclize import Circos; import inspect; print\\(inspect.signature\\(Circos.text\\)\\)\")",
+      "PowerShell(python -c \"from pycirclize import Circos; import inspect; print\\(Circos.text.__doc__\\)\")",
+      "PowerShell(python \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_from_config.py\" --config \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\circular_map_cls_config.json\" --datasets auprc)",
+      "PowerShell(python -m py_compile \"D:\\\\workspace\\\\ThyroidAgent\\\\plot_images\\\\paired_comparison_from_config.py\")"
     ]
   }
 }

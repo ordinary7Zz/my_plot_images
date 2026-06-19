@@ -7,13 +7,14 @@ from typing import Any, Dict, List
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.text import Text
 
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("paired_comparison_config.json")
 SUPPORTED_MANUAL_VALUE_KEYS = ("manual_values", "manual_metric_values")
 DEFAULT_COMPARISON_PLOT_STYLE = {
     "file_suffix": "paired_comparison",  # 输出文件名后缀
-    "x_label": "Performance score",  # X 轴标题文本
+    "x_label": "Metric score",  # X 轴标题文本
     "auto_xlim": False,  # 是否根据数据自动计算 X 轴范围
     "xlim_min": None,  # X 轴下限；auto_xlim=False 时可手动指定
     "xlim_max": None,  # X 轴上限；auto_xlim=False 时可手动指定
@@ -22,8 +23,8 @@ DEFAULT_COMPARISON_PLOT_STYLE = {
     "dpi": 800,  # 保存图片的分辨率
     "value_decimals": 3,  # baseline / target 数值保留的小数位数
     "percent_decimals": 1,  # 提升百分比保留的小数位数
-    "point_size": 50,  # 散点大小
-    "line_width": 0.7,  # baseline 与 target 之间连线的线宽
+    "point_size": 70,  # 散点大小
+    "line_width": 1.8,  # baseline 与 target 之间连线的线宽
     "title_pad": 8,  # 标题与绘图区之间的间距
     "value_offset_points": 5,  # 数值标签相对散点的垂直偏移（单位：points）
     "improvement_offset_points": 6,  # 提升百分比标签相对中点的垂直偏移（单位：points）
@@ -35,30 +36,30 @@ DEFAULT_COMPARISON_PLOT_STYLE = {
     "bottom_margin": 0.14,  # 子图下边距
     "left_margin": 0.25,  # 子图左边距
     "right_margin": 0.97,  # 子图右边距
-    "row_spacing": 1.0,  # 行之间的间距系数
-    "y_margin": 0.10,  # Y 方向留白比例
+    "row_spacing": 0.1,  # 行之间的间距系数
+    "y_margin": 0.01,  # Y 方向留白比例
     "title_fontsize": 10.5,  # 图标题字号（仅 show_title=True 时生效）
-    "xlabel_fontsize": 15,  # X 轴标题字号
-    "ylabel_fontsize": 15,  # Y 轴分类标签字号
-    "value_fontsize": 15.0,  # baseline / target 数值标签字号
-    "percent_fontsize": 15.0,  # 提升百分比标签字号
-    "legend_fontsize": 15.0,  # 图例字号
-    "xtick_fontsize": 15,  # X 轴刻度数字字号
-    "grid_alpha": 0.12,  # 网格线透明度
-    "grid_linewidth": 0.45,  # 网格线宽度
+    "xlabel_fontsize": 24,  # X 轴标题字号
+    "ylabel_fontsize": 24,  # Y 轴分类标签字号
+    "value_fontsize": 26.0,  # baseline / target 数值标签字号
+    "percent_fontsize": 26.0,  # 提升百分比标签字号
+    "legend_fontsize": 24.0,  # 图例字号
+    "xtick_fontsize": 18,  # X 轴刻度数字字号
+    "grid_alpha": 0.63,  # 网格线透明度
+    "grid_linewidth": 1.0,  # 网格线宽度
     "show_confidence_intervals": True,  # 是否显示置信区间
-    "baseline_color": "#7a8798",  # baseline 点和标签颜色
-    "target_color": "#b35c44",  # target 点和标签颜色
-    "line_color": "#c7c7c7",  # baseline 与 target 之间连线颜色
+    "baseline_color": "#0860d4",  # baseline 点和标签颜色
+    "target_color": "#f54818",  # target 点和标签颜色
+    "line_color": "#6e6c6c",  # baseline 与 target 之间连线颜色
     "improvement_color": "#2f6b3b",  # 提升百分比标签颜色
-    "grid_color": "#e7e7e7",  # 网格线颜色
+    "grid_color": "#d5d5d5",  # 网格线颜色
     "spine_color": "#3b3b3b",  # 坐标轴边框颜色
     "marker_edgecolor": "#ffffff",  # 散点描边颜色
     "marker_edgewidth": 0.5,  # 散点描边宽度
     "tick_length": 2.5,  # 刻度线长度
     "tick_width": 0.5,  # 刻度线宽度
-    "legend_marker_size": 8,  # 图例圆点大小
-    "label_linespacing": 1.08,  # Y 轴多行标签的行距
+    "legend_marker_size": 12,  # 图例圆点大小
+    "label_linespacing": 1.2,  # Y 轴多行标签的行距
     "axes_bg_color": "#ffffff",  # 坐标轴背景色
 }
 
@@ -314,6 +315,32 @@ def plot_paired_comparison_chart(
             zorder=3,
         )
 
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels([""] * len(rows))
+    ax.invert_yaxis()
+    ax.margins(y=0.10)
+    ax.set_xlim(vmin, vmax)
+
+    xticks = style_cfg.get("xticks")
+    if not auto_xlim and isinstance(xticks, list) and xticks:
+        ax.set_xticks([float(value) for value in xticks])
+
+    ax.grid(axis="x", linestyle=":", alpha=grid_alpha, linewidth=grid_linewidth, color=grid_color)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["bottom"].set_linewidth(0.7)
+    ax.spines["bottom"].set_color(spine_color)
+    ax.tick_params(axis="x", labelbottom=False, width=tick_width, length=tick_length, color=spine_color)
+    ax.tick_params(axis="y", labelleft=False, length=0, pad=6)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    file_slug = dataset_cfg.get("file_slug", metric_name)
+    output_png = output_dir / f"{file_slug}_{file_suffix}.png"
+    output_svg = output_dir / f"{file_slug}_{file_suffix}.svg"
+    output_svg_no_text = output_dir / f"{file_slug}_{file_suffix}_no_text.svg"
+
+    for y, row in zip(y_positions, rows):
         if value_label_mode in {"both", "baseline"}:
             ax.annotate(
                 f"{row['baseline']:.{value_decimals}f}",
@@ -352,31 +379,18 @@ def plot_paired_comparison_chart(
                 va=improvement_va,
             )
 
-    ax.set_yticks(y_positions)
     formatted_labels = [format_comparison_label(row["label"]) for row in rows]
     ax.set_yticklabels(formatted_labels, fontsize=ylabel_fontsize)
     for tick_label in ax.get_yticklabels():
         tick_label.set_linespacing(label_linespacing)
         tick_label.set_horizontalalignment("right")
-    ax.invert_yaxis()
-    ax.margins(y=0.10)
+
     ax.set_xlabel(x_label, fontsize=xlabel_fontsize, fontweight="normal")
     if show_title:
         ax.set_title(title, fontsize=title_fontsize, pad=title_pad)
-    ax.set_xlim(vmin, vmax)
 
-    xticks = style_cfg.get("xticks")
-    if not auto_xlim and isinstance(xticks, list) and xticks:
-        ax.set_xticks([float(value) for value in xticks])
-
-    ax.grid(axis="x", linestyle=":", alpha=grid_alpha, linewidth=grid_linewidth, color=grid_color)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-    ax.spines["bottom"].set_linewidth(0.7)
-    ax.spines["bottom"].set_color(spine_color)
-    ax.tick_params(axis="x", labelsize=xtick_fontsize, width=tick_width, length=tick_length, color=spine_color)
-    ax.tick_params(axis="y", length=0, pad=6)
+    ax.tick_params(axis="x", labelbottom=True, labelsize=xtick_fontsize, width=tick_width, length=tick_length, color=spine_color)
+    ax.tick_params(axis="y", labelleft=True, length=0, pad=6)
 
     legend_handles = [
         Line2D([0], [0], marker="o", color="none", markerfacecolor=baseline_color, markeredgecolor=marker_edgecolor, markeredgewidth=marker_edgewidth, markersize=legend_marker_size, label=baseline_label),
@@ -384,13 +398,21 @@ def plot_paired_comparison_chart(
     ]
     ax.legend(handles=legend_handles, loc="upper right", frameon=False, fontsize=legend_fontsize, handletextpad=0.5, borderaxespad=0.2)
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-    file_slug = dataset_cfg.get("file_slug", metric_name)
-    output_png = output_dir / f"{file_slug}_{file_suffix}.png"
+    text_artists = [artist for artist in fig.findobj(match=Text)]
+    previous_text_visibility = [artist.get_visible() for artist in text_artists]
+    for artist in text_artists:
+        artist.set_visible(False)
+    fig.savefig(output_svg_no_text, bbox_inches="tight")
+    for artist, was_visible in zip(text_artists, previous_text_visibility):
+        artist.set_visible(was_visible)
+
     fig.savefig(output_png, dpi=dpi, bbox_inches="tight")
+    fig.savefig(output_svg, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved: {output_png}")
+    print(f"Saved: {output_svg}")
+    print(f"Saved: {output_svg_no_text}")
 
 
 def parse_args(dataset_keys: List[str]) -> argparse.Namespace:

@@ -4,7 +4,7 @@
   },
   "plot": {
     "model_order": [
-      "ThyroidXgent",
+      "ThyroidXAgent",
       "Baseline"
     ]
   },
@@ -25,12 +25,12 @@
             "target": 0.8053
           },
           {
-            "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUPRC",
+            "label": "Lymph Node Metastasis\n(LLNM Net) -\nAUPRC",
             "baseline": 0.7363,
             "target": 0.8808
           },
           {
-            "label": "Lymph Node Metastasis\n(LLNM Net') -\nAUROC",
+            "label": "Lymph Node Metastasis\n(LLNM Net) -\nAUROC",
             "baseline": 0.7665,
             "target": 0.8642
           }

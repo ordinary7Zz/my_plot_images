@@ -35,9 +35,9 @@
       "metric_title": "Dice (%)",
       "category_map": {
         "Datasets": [
+          "ThyroidXL",
           "TN3K",
           "DDTI",
-          "ThyroidXL",
           "PKTN",
           "TN5K"
         ]
@@ -88,20 +88,20 @@
       "metric_title": "HD95",
       "category_map": {
         "Datasets": [
+          "ThyroidXL",
           "TN3K",
           "DDTI",
-          "ThyroidXL",
           "PKTN",
           "TN5K"
         ]
       },
       "manual_values": {
         "TransUnet": {
-          "TN3K": 39.27,
-          "DDTI": 25.46,
-          "ThyroidXL": 27.42,
-          "PKTN": 36.88,
-          "TN5K": 32.32
+          "TN3K": 27.27,
+          "DDTI": 20.46,
+          "ThyroidXL": 22.42,
+          "PKTN": 26.88,
+          "TN5K": 22.32
         },
         "MedSegX": {
           "TN3K": 10.95,

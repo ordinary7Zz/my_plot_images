@@ -12,41 +12,39 @@ import numpy as np
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("circular_map_config.json")
 SUPPORTED_MANUAL_VALUE_KEYS = ("manual_values", "manual_metric_values")
 DEFAULT_PLOT_STYLE = {
-    "start_angle": 90.0,  # 圆环绘图起始角度（单位：度）
-    "end_angle": 360.0,  # 圆环绘图结束角度（单位：度）
-    "endspace": False,  # 结束位置是否保留空白扇区
-    "sector_spacing": 12.0,  # 不同扇区之间的间隔角度（单位：度）
-    "track_outer_radius": 100.0,  # 最外层轨道的外半径
-    "track_thickness": 10.0,  # 每一层轨道的厚度
-    "track_gap": 2.0,  # 相邻轨道之间的径向间距
-    "track_inner_radius": 0.0,  # 最内层轨道的内半径
-    "track_pad_ratio": 0.1,  # 轨道内部留白比例，用于控制热图与边缘的间距
-    "figsize": [12, 12],  # 画布大小（宽, 高），单位英寸
-    "dpi": 600,  # 输出图像分辨率
-    "cmap": "Purples",  # 默认颜色映射方案
-    "group_cmap": "Set1",  # 分组标签使用的调色板
-    "missing_color": "#E0E0E0",  # 缺失值显示颜色
-    "rect_edgecolor": "white",  # 热图矩形边框颜色
-    "rect_linewidth": 0.3,  # 热图矩形边框宽度
-    "label_margin": 3.0,  # 外圈标签与圆环之间的距离
-    "label_orientation": "vertical",  # 外圈标签的显示方向
-    "show_outer_axis": False,  # 是否显示最外层坐标轴
-    "metric_title": "Score",  # 色条标题文字
-    "colorbar_bounds": [0.88, 0.75, 0.025, 0.2],  # 色条位置与大小：[left, bottom, width, height]
-    "colorbar_labelpad": 14.0,  # 色条标题与色条之间的间距
-    "colorbar_label_rotation": 90.0,  # 色条标题旋转角度
-    "model_text_prefix": " ",  # 模型名文字前缀，通常留一个空格避免贴边
-    "model_text_ha": "left",  # 模型名文字的水平对齐方式
-    "model_text_color": "black",  # 模型名文字颜色
-    "model_text_deg": 0.0,  # 模型名文字所在角度
-    "model_text_orientation": "horizontal",  # 模型名文字排布方向
+    "start_angle": 55.0,
+    "end_angle": 360.0,
+    "endspace": False,
+    "sector_spacing": 12.0,
+    "track_outer_radius": 100.0,
+    "track_thickness": 10.0,
+    "track_gap": 2.0,
+    "track_pad_ratio": 0.1,
+    "figsize": [12, 12],
+    "dpi": 600,
+    "cmap": "Purples",
+    "group_cmap": "Set1",
+    "missing_color": "#E0E0E0",
+    "rect_edgecolor": "white",
+    "rect_linewidth": 0.3,
+    "label_margin": 3.0,
+    "label_orientation": "vertical",
+    "show_outer_axis": False,
+    "metric_title": "Score",
+    "colorbar_bounds": [0.84, 0.8, 0.025, 0.2],
+    "colorbar_labelpad": 14.0,
+    "colorbar_label_rotation": 90.0,
+    "model_text_prefix": " ",
+    "model_text_size": 28.0,
+    "model_text_ha": "left",
+    "model_text_color": "black",
 }
 DEFAULT_FONT_STYLE = {
     "category": 52, 
-    "cbar_title": 40, # 色条标题
-    "cbar_ticks": 40, # 色条数字
-    "legend": 50, # 模型名
-    "pathology": 42, # 外圈标签
+    "cbar_title": 32, # 色条标题
+    "cbar_ticks": 32, # 色条数字
+    "legend": 42, # 模型名
+    "pathology": 32, # 外圈标签
 }
 DATASET_PLOT_OVERRIDES = {
     "auroc": {
@@ -68,18 +66,18 @@ DATASET_PLOT_OVERRIDES = {
         "vmax": 90.0,
         "figsize": [14, 14],
         "cmap": "PuBu",
-        "color_breaks": [70.0, 90.0],
-        "color_positions": [0.0, 1.0],
+        "color_breaks": [70.0, 75.0, 80.0, 85.0, 90.0],
+        "color_positions": [0.0, 0.25, 0.5, 0.75, 1.0],
     },
     "hd95": {
         "vmin": 5.0,
-        "vmax": 35.0,
+        "vmax": 30.0,
         "figsize": [14, 14],
         "cmap": "PuBu",
         "lower_is_better": True,
         "invert_colorbar": True,
-        "color_breaks": [5.0, 30.0],
-        "color_positions": [0.0, 1.0],
+        "color_breaks": [5.0, 10.0, 15.0, 20.0, 25.0, 30.0],
+        "color_positions": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
     },
 }
 
@@ -102,7 +100,7 @@ def build_color_normalizer(plot_cfg: Dict[str, Any], vmin: float, vmax: float) -
     positions = plot_cfg.get("color_positions")
     if not isinstance(breaks, list) or not isinstance(positions, list):
         tick_values = np.linspace(vmin, vmax, 5).tolist()
-        tick_labels = [f"{tick:.1f}" if vmax <= 1.0 else f"{tick:.0f}" for tick in tick_values]
+        tick_labels = [f"{tick:.2f}" if vmax <= 1.0 else f"{tick:.0f}" for tick in tick_values]
 
         def linear_map(values: np.ndarray) -> np.ndarray:
             clipped = np.clip(values, vmin, vmax)
@@ -128,7 +126,7 @@ def build_color_normalizer(plot_cfg: Dict[str, Any], vmin: float, vmax: float) -
     def piecewise_map(values: np.ndarray) -> np.ndarray:
         return np.interp(np.clip(values, vmin, vmax), break_values, position_values)
 
-    tick_labels = [f"{tick:.1f}" if vmax <= 1.0 else f"{tick:.0f}" for tick in break_values]
+    tick_labels = [f"{tick:.2f}" if vmax <= 1.0 else f"{tick:.0f}" for tick in break_values]
     return piecewise_map, break_values, tick_labels
 
 
@@ -283,29 +281,8 @@ def build_track_ranges(model_count: int, plot_cfg: Dict[str, Any]) -> List[Tuple
         return track_ranges
 
     track_outer_radius = float(plot_cfg.get("track_outer_radius", DEFAULT_PLOT_STYLE["track_outer_radius"]))
+    track_thickness = float(plot_cfg.get("track_thickness", DEFAULT_PLOT_STYLE["track_thickness"]))
     track_gap = float(plot_cfg.get("track_gap", DEFAULT_PLOT_STYLE["track_gap"]))
-    track_inner_radius = float(plot_cfg.get("track_inner_radius", DEFAULT_PLOT_STYLE["track_inner_radius"]))
-
-    if model_count <= 0:
-        return []
-    if track_inner_radius < 0.0:
-        raise ValueError("plot.track_inner_radius must be >= 0.")
-    if track_inner_radius >= track_outer_radius:
-        raise ValueError("plot.track_inner_radius must be smaller than plot.track_outer_radius.")
-
-    available_radius = track_outer_radius - track_inner_radius
-    if model_count == 1:
-        return [(track_inner_radius, track_outer_radius)]
-
-    total_gap = track_gap * (model_count - 1)
-    if total_gap >= available_radius:
-        track_gap = available_radius / (model_count * 10.0)
-        total_gap = track_gap * (model_count - 1)
-
-    track_thickness = (available_radius - total_gap) / model_count
-    if track_thickness <= 0.0:
-        raise ValueError("Track layout cannot fit the selected models inside the configured radius.")
-
     track_ranges = []
     current_outer = track_outer_radius
     for _ in range(model_count):
@@ -379,16 +356,11 @@ def plot_circular_heatmap(
     show_outer_axis = bool(plot_cfg.get("show_outer_axis", DEFAULT_PLOT_STYLE["show_outer_axis"]))
     model_text_prefix = str(plot_cfg.get("model_text_prefix", DEFAULT_PLOT_STYLE["model_text_prefix"]))
     model_text_labels = plot_cfg.get("model_text_labels", {})
-    model_text_size = float(fonts["legend"])
+    model_text_size = float(plot_cfg.get("model_text_size", fonts["legend"]))
     model_text_ha = str(plot_cfg.get("model_text_ha", DEFAULT_PLOT_STYLE["model_text_ha"]))
     model_text_color = str(plot_cfg.get("model_text_color", DEFAULT_PLOT_STYLE["model_text_color"]))
-    model_text_deg = float(plot_cfg.get("model_text_deg", DEFAULT_PLOT_STYLE["model_text_deg"]))
-    model_text_orientation = str(plot_cfg.get("model_text_orientation", DEFAULT_PLOT_STYLE["model_text_orientation"]))
-
-    plt.rcParams.update({"font.family": "Arial", "font.sans-serif": ["Arial"], "axes.unicode_minus": False})
 
     circos = Circos(sectors, space=sector_spacing, start=start_angle, end=end_angle, endspace=endspace)
-    sector_outer_tracks: List[Tuple[Any, List[str]]] = []
 
     for sector in circos.sectors:
         labels = sector_labels[sector.name]
@@ -413,61 +385,21 @@ def plot_circular_heatmap(
                 outer_track = track
 
         if outer_track is not None:
-            sector_outer_tracks.append((outer_track, labels))
-
-    colorbar_bounds = plot_cfg.get("colorbar_bounds", DEFAULT_PLOT_STYLE["colorbar_bounds"])
-    colorbar_labelpad = float(plot_cfg.get("colorbar_labelpad", DEFAULT_PLOT_STYLE["colorbar_labelpad"]))
-    colorbar_label_rotation = float(plot_cfg.get("colorbar_label_rotation", DEFAULT_PLOT_STYLE["colorbar_label_rotation"]))
-
-    def add_colorbar(fig, include_labels: bool) -> None:
-        colorbar_ax = fig.add_axes(tuple(float(value) for value in colorbar_bounds))
-        scalar_mappable = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0.0, vmax=1.0))
-        scalar_mappable.set_array([])
-        colorbar = fig.colorbar(scalar_mappable, cax=colorbar_ax, orientation="vertical")
-        if include_labels:
-            colorbar.set_ticks(color_mapper(np.array(colorbar_ticks, dtype=float)).tolist())
-            colorbar.set_ticklabels(colorbar_ticklabels)
-            if bool(plot_cfg.get("invert_colorbar", False)):
-                colorbar.ax.invert_yaxis()
-            colorbar.ax.tick_params(labelsize=fonts["cbar_ticks"], colors="black")
-            colorbar.set_label(
-                metric_title,
-                size=fonts["cbar_title"],
-                color="black",
-                labelpad=colorbar_labelpad,
-                rotation=colorbar_label_rotation,
-                loc="top",
+            outer_track.xticks(
+                [index + 0.5 for index in range(len(labels))],
+                labels=[label_display(label) for label in labels],
+                outer=True,
+                tick_length=0,
+                label_margin=label_margin,
+                label_size=fonts["pathology"],
+                label_orientation=label_orientation,
             )
-        else:
-            colorbar.set_ticks([])
-            colorbar.ax.tick_params(length=0)
 
-    fig = circos.plotfig(dpi=dpi, figsize=figsize)
-    add_colorbar(fig, include_labels=False)
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_svg = output_path.with_suffix(".svg")
-    output_svg_with_text = output_path.with_name(f"{output_path.stem}_with_text.svg")
-    fig.savefig(output_svg, format="svg", bbox_inches="tight")
-    plt.close(fig)
-
-    for outer_track, labels in sector_outer_tracks:
-        outer_track.xticks(
-            [index + 0.5 for index in range(len(labels))],
-            labels=[label_display(label) for label in labels],
-            outer=True,
-            tick_length=0,
-            label_margin=label_margin,
-            label_size=fonts["pathology"],
-            label_orientation=label_orientation,
-        )
 
     for track_range, model_name in zip(track_ranges, models):
         circos.text(
             f"{model_text_prefix}{model_text_labels.get(model_name, model_name)}",
             r=(track_range[0] + track_range[1]) / 2,
-            deg=model_text_deg,
-            orientation=model_text_orientation,
             color=model_text_color,
             ha=model_text_ha,
             va="center",
@@ -475,19 +407,32 @@ def plot_circular_heatmap(
         )
 
     fig = circos.plotfig(dpi=dpi, figsize=figsize)
-    add_colorbar(fig, include_labels=True)
+    colorbar_bounds = plot_cfg.get("colorbar_bounds", DEFAULT_PLOT_STYLE["colorbar_bounds"])
+    colorbar_labelpad = float(plot_cfg.get("colorbar_labelpad", DEFAULT_PLOT_STYLE["colorbar_labelpad"]))
+    colorbar_label_rotation = float(plot_cfg.get("colorbar_label_rotation", DEFAULT_PLOT_STYLE["colorbar_label_rotation"]))
+    colorbar_ax = fig.add_axes(tuple(float(value) for value in colorbar_bounds))
+    scalar_mappable = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0.0, vmax=1.0))
+    scalar_mappable.set_array([])
+    colorbar = fig.colorbar(scalar_mappable, cax=colorbar_ax, orientation="vertical")
+    colorbar.set_ticks(color_mapper(np.array(colorbar_ticks, dtype=float)).tolist())
+    colorbar.set_ticklabels(colorbar_ticklabels)
+    if bool(plot_cfg.get("invert_colorbar", False)):
+        colorbar.ax.invert_yaxis()
+    colorbar.ax.tick_params(labelsize=fonts["cbar_ticks"], colors="black")
+    colorbar.set_label(
+        metric_title,
+        size=fonts["cbar_title"],
+        color="black",
+        labelpad=colorbar_labelpad,
+        rotation=colorbar_label_rotation,
+        loc="top",
+    )
 
-    previous_svg_fonttype = plt.rcParams.get("svg.fonttype")
-    plt.rcParams["svg.fonttype"] = "none"
-    fig.savefig(output_svg_with_text, format="svg", bbox_inches="tight")
-    if previous_svg_fonttype is not None:
-        plt.rcParams["svg.fonttype"] = previous_svg_fonttype
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved: {output_path}")
-    print(f"Saved: {output_svg}")
-    print(f"Saved: {output_svg_with_text}")
 
 
 def parse_args() -> argparse.Namespace:

@@ -37,9 +37,9 @@
       ],
       "category_map": {
         "Datasets": [
-          "TN3K",
-          "DDTI",
           "ThyroidXL",
+          "DDTI",
+          "TN3K",
           "TN5K"
         ]
       },
@@ -86,9 +86,9 @@
       ],
       "category_map": {
         "Datasets": [
-          "TN3K",
-          "DDTI",
           "ThyroidXL",
+          "DDTI",
+          "TN3K",
           "TN5K"
         ]
       },
