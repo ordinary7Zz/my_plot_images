@@ -22,10 +22,10 @@ from tqdm import tqdm
 
 # ======================== 用户输入区域 ========================
 # 数据集名称
-dataset_name = "TN3K"
+dataset_name = "Augtrain"
 
 # 掩码文件夹路径（支持 png, jpg, bmp, tif 等常见格式）
-mask_dir = "/path/to/your/mask/folder"
+mask_dir = "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask"
 
 # 输出根目录（默认为当前脚本所在目录）
 output_root = os.path.dirname(os.path.abspath(__file__))
