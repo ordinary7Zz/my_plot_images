@@ -20,7 +20,7 @@ class_names = ["Benign", "Malignant"]
 # 每个数据集对应的两类数量 [类别1数量, 类别2数量]
 counts = [
     [2709, 2638],      # TN3K
-    [1301, 3199],      # TN5K
+    [1426, 3574],      # TN5K
     [8172, 3459],      # ThyroidXL
     [304, 45],     # DDTI
     [426, 1248],      # FinalData
@@ -33,7 +33,7 @@ output_name = "binary_classification_bar"
 title = "Benign vs Malignant Case Counts by Dataset"
 
 # Y轴标签
-ylabel = "Number of Cases"
+ylabel = "Number of Cases (log scale)"
 
 # X轴标签
 xlabel = "Dataset"
