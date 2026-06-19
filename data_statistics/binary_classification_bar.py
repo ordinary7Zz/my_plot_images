@@ -12,7 +12,7 @@ import os
 
 # ======================== 用户输入区域 ========================
 # 数据集名称
-datasets = ["TN3K", "ThyUS2Path", "ThyroidXL", "PKTN", "Cine-clip"]
+datasets = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "FinalData"]
 
 # 二分类类别名称
 class_names = ["Benign", "Malignant"]
@@ -20,10 +20,10 @@ class_names = ["Benign", "Malignant"]
 # 每个数据集对应的两类数量 [类别1数量, 类别2数量]
 counts = [
     [2709, 2638],      # TN3K
-    [4838, 3670],      # ThyUS2Path
+    [1301, 3199],      # TN5K
     [8172, 3459],      # ThyroidXL
-    [15444, 1968],     # PKTN
-    [1301, 3199],      # Cine-clip
+    [304, 45],     # DDTI
+    [426, 1248],      # FinalData
 ]
 
 # 输出文件名（不含扩展名）

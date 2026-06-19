@@ -47,6 +47,11 @@ mask_dirs = [
 output_root = os.path.dirname(os.path.abspath(__file__))
 
 # ======================== 配置区域 ========================
+# 字号统一设置
+TICK_LABEL_FONTSIZE = 20       # XY轴刻度数值字号
+AXIS_LABEL_FONTSIZE = 11       # 轴标签字号
+TITLE_FONTSIZE = 12            # 标题字号
+
 # 图像尺寸
 figsize_position = (5, 5)
 figsize_size = (5, 4.5)
@@ -190,7 +195,7 @@ def plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir, save_svg=Tr
         ax.set_xlabel('')
         ax.set_ylabel('')
         ax.set_title('')
-        ax.tick_params(axis='both', labelsize=10)
+        ax.tick_params(axis='both', labelsize=TICK_LABEL_FONTSIZE)
         
         plt.tight_layout()
         svg_path = os.path.join(output_dir, "position_with_ticks.svg")
@@ -211,14 +216,14 @@ def plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir, save_svg=Tr
         ax.set_aspect('equal')
         
         # 添加标签
-        ax.set_xlabel('pos_x', fontsize=11)
-        ax.set_ylabel('pos_y', fontsize=11)
-        ax.set_title(f'{dataset_name} - Position (N={n_samples})', fontsize=12)
+        ax.set_xlabel('pos_x', fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_ylabel('pos_y', fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_title(f'{dataset_name} - Position (N={n_samples})', fontsize=TITLE_FONTSIZE)
         
         # 设置刻度
         ax.set_xticks(np.arange(0, 1.1, 0.2))
         ax.set_yticks(np.arange(0, 1.1, 0.2))
-        ax.tick_params(axis='both', labelsize=10)
+        ax.tick_params(axis='both', labelsize=TICK_LABEL_FONTSIZE)
         
         plt.tight_layout()
         png_path = os.path.join(output_dir, "position.png")
@@ -280,7 +285,7 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
         ax.set_xlabel('')
         ax.set_ylabel('')
         ax.set_title('')
-        ax.tick_params(axis='both', labelsize=10)
+        ax.tick_params(axis='both', labelsize=TICK_LABEL_FONTSIZE)
         
         plt.tight_layout()
         svg_path = os.path.join(output_dir, "size_with_ticks.svg")
@@ -301,12 +306,12 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
         ax.set_ylim(0, None)
         
         # 添加标签
-        ax.set_xlabel('relative size', fontsize=11)
-        ax.set_ylabel('density', fontsize=11)
-        ax.set_title(f'{dataset_name} - Size (N={n_samples})', fontsize=12)
+        ax.set_xlabel('relative size', fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_ylabel('density', fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_title(f'{dataset_name} - Size (N={n_samples})', fontsize=TITLE_FONTSIZE)
         
         # 设置刻度
-        ax.tick_params(axis='both', labelsize=10)
+        ax.tick_params(axis='both', labelsize=TICK_LABEL_FONTSIZE)
         
         plt.tight_layout()
         png_path = os.path.join(output_dir, "size.png")
