@@ -48,7 +48,7 @@ output_root = os.path.dirname(os.path.abspath(__file__))
 
 # ======================== 配置区域 ========================
 # 字号统一设置
-TICK_LABEL_FONTSIZE = 20       # XY轴刻度数值字号
+TICK_LABEL_FONTSIZE = 18       # XY轴刻度数值字号
 AXIS_LABEL_FONTSIZE = 11       # 轴标签字号
 TITLE_FONTSIZE = 12            # 标题字号
 
@@ -180,6 +180,8 @@ def plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir, save_svg=Tr
     # ==================== SVG（仅刻度值）====================
     if save_svg:
         fig, ax = plt.subplots(figsize=figsize_position)
+        fig.patch.set_alpha(0)  # 图形背景透明
+        ax.set_facecolor('none')  # 绘图区背景透明
         
         # 绘制填充等高线图
         ax.contourf(X, Y, Z, levels=15, cmap=position_cmap)
@@ -199,7 +201,7 @@ def plot_position(pos_x, pos_y, dataset_name, n_samples, output_dir, save_svg=Tr
         
         plt.tight_layout()
         svg_path = os.path.join(output_dir, "position_with_ticks.svg")
-        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
+        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150, transparent=True)
         plt.close(fig)
         print(f"位置分布 SVG (仅刻度值) 已保存: {svg_path}")
     
@@ -272,6 +274,8 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
     # ==================== SVG（仅刻度值）====================
     if save_svg:
         fig, ax = plt.subplots(figsize=figsize_size)
+        fig.patch.set_alpha(0)  # 图形背景透明
+        ax.set_facecolor('none')  # 绘图区背景透明
         
         # 绘制 KDE 曲线和填充
         ax.plot(x_range, density, color=size_edge_color, linewidth=1.5)
@@ -289,7 +293,7 @@ def plot_size(rel_sizes, dataset_name, n_samples, output_dir, save_svg=True, sav
         
         plt.tight_layout()
         svg_path = os.path.join(output_dir, "size_with_ticks.svg")
-        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
+        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150, transparent=True)
         plt.close(fig)
         print(f"尺寸分布 SVG (仅刻度值) 已保存: {svg_path}")
     
