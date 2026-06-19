@@ -36,11 +36,11 @@ dataset_names = [
 mask_dirs = [
     "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask",
     "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/finall_data/mask",
-    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN3K/train/mask",
-    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/mask",
-    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/PKTN/train/mask",
-    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/mask",
-    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/mask",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN3K/train/masks",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/masks",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/PKTN/train/masks",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/masks",
+    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/masks",
 ]
 
 # 输出根目录（默认为当前脚本所在目录）
