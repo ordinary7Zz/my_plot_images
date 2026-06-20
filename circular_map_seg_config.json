@@ -36,10 +36,10 @@
       "category_map": {
         "Datasets": [
           "Augtrain",
-          "TN3K",
-          "TN5K",
           "PKTN",
-          "ThyroidXL"
+          "ThyroidXL",
+          "TN3K",
+          "TN5K"
         ]
       },
       "manual_values": {
@@ -89,10 +89,10 @@
       "category_map": {
         "Datasets": [
           "Augtrain",
-          "TN3K",
-          "TN5K",
           "PKTN",
-          "ThyroidXL"
+          "ThyroidXL",
+          "TN3K",
+          "TN5K"
         ]
       },
       "manual_values": {

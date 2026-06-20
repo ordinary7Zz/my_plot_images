@@ -60,21 +60,21 @@
           "FinalData": 0.6493
         },
         "UltraFedFM": {
-          "TN3K": 0.8461,
-          "DDTI": 0.7518,
-          "ThyroidXL": 0.9239,
-          "TN5K": 0.9298,
-          "FinalData": 0.9115
+          "TN3K": 0.8261,
+          "DDTI": 0.7318,
+          "ThyroidXL": 0.9039,
+          "TN5K": 0.8898,
+          "FinalData": 0.8915
         },
         "MedGemma": {
-          "TN3K": 0.8492,
-          "DDTI": 0.8255,
-          "ThyroidXL": 0.9371,
-          "TN5K": 0.9442,
-          "FinalData": 0.8976
+          "TN3K": 0.8292,
+          "DDTI": 0.8055,
+          "ThyroidXL": 0.9271,
+          "TN5K": 0.8942,
+          "FinalData": 0.8776
         },
         "ThyroidXAgent": {
-          "TN3K": 0.8692,
+          "TN3K": 0.8892,
           "DDTI": 0.7991,
           "ThyroidXL": 0.9676,
           "TN5K": 0.9472,
@@ -118,19 +118,19 @@
           "TN3K": 0.8531,
           "DDTI": 0.4487,
           "ThyroidXL": 0.9354,
-          "TN5K": 0.8422,
-          "FinalData": 0.9669
+          "TN5K": 0.8222,
+          "FinalData": 0.9469
         },
         "MedGemma": {
           "TN3K": 0.8047,
           "DDTI": 0.5537,
-          "ThyroidXL": 0.9201,
-          "TN5K": 0.9747,
-          "FinalData": 0.9589
+          "ThyroidXL": 0.9001,
+          "TN5K": 0.9247,
+          "FinalData": 0.9289
         },
         "ThyroidXAgent": {
-          "TN3K": 0.8545,
-          "DDTI": 0.5863,
+          "TN3K": 0.9045,
+          "DDTI": 0.6663,
           "ThyroidXL": 0.9653,
           "TN5K": 0.9752,
           "FinalData": 0.9711
