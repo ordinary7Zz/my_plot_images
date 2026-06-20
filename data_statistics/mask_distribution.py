@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, Normalize
 from scipy.stats import gaussian_kde
 from tqdm import tqdm
 

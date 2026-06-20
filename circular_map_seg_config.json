@@ -35,45 +35,45 @@
       "metric_title": "Dice (%)",
       "category_map": {
         "Datasets": [
-          "ThyroidXL",
+          "Augtrain",
           "TN3K",
-          "PKTN",
           "TN5K",
-          "Augtrain"
+          "PKTN",
+          "ThyroidXL"
         ]
       },
       "manual_values": {
         "TransUnet": {
           "TN3K": 81.84,
-          "Augtrain": 76.96,
+          "Augtrain": 84.83,
           "ThyroidXL": 85.75,
           "PKTN": 76.89,
           "TN5K": 78.54
         },
         "MedSegX": {
           "TN3K": 83.93,
-          "Augtrain": 85.34,
+          "Augtrain": 85.40,
           "ThyroidXL": 79.98,
           "PKTN": 80.63,
           "TN5K": 83.10
         },
         "MedSAM2": {
           "TN3K": 84.47,
-          "Augtrain": 84.90,
+          "Augtrain": 91.53,
           "ThyroidXL": 83.74,
           "PKTN": 80.71,
           "TN5K": 81.22
         },
         "UltraFedFM": {
           "TN3K": 81.18,
-          "Augtrain": 75.55,
+          "Augtrain": 83.10,
           "ThyroidXL": 84.70,
           "PKTN": 75.31,
           "TN5K": 77.13
         },
         "ThyroidXAgent": {
           "TN3K": 85.28,
-          "Augtrain": 85.16,
+          "Augtrain": 91.46,
           "ThyroidXL": 87.58,
           "PKTN": 82.96,
           "TN5K": 83.26
@@ -88,45 +88,45 @@
       "metric_title": "HD95",
       "category_map": {
         "Datasets": [
-          "ThyroidXL",
-          "TN3K",
           "Augtrain",
+          "TN3K",
+          "TN5K",
           "PKTN",
-          "TN5K"
+          "ThyroidXL"
         ]
       },
       "manual_values": {
         "TransUnet": {
           "TN3K": 27.27,
-          "Augtrain": 20.46,
+          "Augtrain": 18.81,
           "ThyroidXL": 22.42,
           "PKTN": 26.88,
           "TN5K": 22.32
         },
         "MedSegX": {
           "TN3K": 10.95,
-          "Augtrain": 10.44,
+          "Augtrain": 9.37,
           "ThyroidXL": 11.07,
           "PKTN": 10.83,
           "TN5K": 11.76
         },
         "MedSAM2": {
           "TN3K": 11.51,
-          "Augtrain": 9.68,
+          "Augtrain": 3.56,
           "ThyroidXL": 6.91,
           "PKTN": 10.69,
           "TN5K": 10.94
         },
         "UltraFedFM": {
           "TN3K": 14.98,
-          "Augtrain": 18.10,
+          "Augtrain": 9.06,
           "ThyroidXL": 8.10,
           "PKTN": 16.08,
           "TN5K": 14.96
         },
         "ThyroidXAgent": {
           "TN3K": 10.31,
-          "Augtrain": 9.44,
+          "Augtrain": 1.92,
           "ThyroidXL": 5.43,
           "PKTN": 9.01,
           "TN5K": 10.12

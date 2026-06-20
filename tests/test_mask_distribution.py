@@ -30,7 +30,13 @@ def install_dependency_stubs():
         def from_list(*args, **kwargs):
             return object()
 
+    class FakeNormalize:
+        def __init__(self, vmin=None, vmax=None):
+            self.vmin = vmin
+            self.vmax = vmax
+
     matplotlib_colors_module.LinearSegmentedColormap = FakeLinearSegmentedColormap
+    matplotlib_colors_module.Normalize = FakeNormalize
     sys.modules.setdefault("matplotlib", matplotlib_module)
     sys.modules.setdefault("matplotlib.pyplot", matplotlib_pyplot_module)
     sys.modules.setdefault("matplotlib.colors", matplotlib_colors_module)
@@ -46,6 +52,9 @@ from data_statistics import mask_distribution as md
 
 
 class SharedPlotParameterTests(unittest.TestCase):
+    def test_mask_distribution_imports_normalize_for_shared_position_scale(self):
+        self.assertTrue(hasattr(md, "Normalize"))
+
     def test_compute_shared_size_xlim_uses_global_relative_size_maximum(self):
         dataset_stats = [
             {"rel_sizes": np.array([0.10, 0.20])},
