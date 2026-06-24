@@ -35,9 +35,10 @@
       "metric_title": "Dice (%)",
       "category_map": {
         "Datasets": [
-          "Augtrain",
-          "PKTN",
+          "Shanghai7K",
+          "Zhujiang2K",
           "ThyroidXL",
+          "PKTN",
           "TN3K",
           "TN5K"
         ]
@@ -45,38 +46,43 @@
       "manual_values": {
         "TransUnet": {
           "TN3K": 81.84,
-          "Augtrain": 84.83,
+          "Shanghai7K": 84.83,
           "ThyroidXL": 85.75,
           "PKTN": 76.89,
-          "TN5K": 78.54
+          "TN5K": 78.54,
+          "Zhujiang2K": 80.72
         },
         "MedSegX": {
           "TN3K": 83.93,
-          "Augtrain": 85.40,
+          "Shanghai7K": 85.40,
           "ThyroidXL": 79.98,
           "PKTN": 80.63,
-          "TN5K": 83.10
+          "TN5K": 83.10,
+          "Zhujiang2K": 84.06
         },
         "MedSAM2": {
           "TN3K": 84.47,
-          "Augtrain": 91.53,
+          "Shanghai7K": 91.53,
           "ThyroidXL": 83.74,
           "PKTN": 80.71,
-          "TN5K": 81.22
+          "TN5K": 81.22,
+          "Zhujiang2K": 90.73
         },
         "UltraFedFM": {
           "TN3K": 81.18,
-          "Augtrain": 83.10,
+          "Shanghai7K": 83.10,
           "ThyroidXL": 84.70,
           "PKTN": 75.31,
-          "TN5K": 77.13
+          "TN5K": 77.13,
+          "Zhujiang2K": 80.64
         },
         "ThyroidXAgent": {
           "TN3K": 85.28,
-          "Augtrain": 91.46,
+          "Shanghai7K": 91.46,
           "ThyroidXL": 87.58,
           "PKTN": 82.96,
-          "TN5K": 83.26
+          "TN5K": 83.26,
+          "Zhujiang2K": 96.83
         }
       }
     },
@@ -88,9 +94,10 @@
       "metric_title": "HD95",
       "category_map": {
         "Datasets": [
-          "Augtrain",
-          "PKTN",
+          "Shanghai7K",
+          "Zhujiang2K",
           "ThyroidXL",
+          "PKTN",
           "TN3K",
           "TN5K"
         ]
@@ -98,38 +105,43 @@
       "manual_values": {
         "TransUnet": {
           "TN3K": 27.27,
-          "Augtrain": 18.81,
+          "Shanghai7K": 18.81,
           "ThyroidXL": 22.42,
           "PKTN": 26.88,
-          "TN5K": 22.32
+          "TN5K": 22.32,
+          "Zhujiang2K": 18.37
         },
         "MedSegX": {
           "TN3K": 10.95,
-          "Augtrain": 9.37,
+          "Shanghai7K": 9.37,
           "ThyroidXL": 11.07,
           "PKTN": 10.83,
-          "TN5K": 11.76
+          "TN5K": 11.76,
+          "Zhujiang2K": 10.96
         },
         "MedSAM2": {
           "TN3K": 11.51,
-          "Augtrain": 3.56,
+          "Shanghai7K": 3.56,
           "ThyroidXL": 6.91,
           "PKTN": 10.69,
-          "TN5K": 10.94
+          "TN5K": 10.94,
+          "Zhujiang2K": 6.79
         },
         "UltraFedFM": {
           "TN3K": 14.98,
-          "Augtrain": 9.06,
+          "Shanghai7K": 9.06,
           "ThyroidXL": 8.10,
           "PKTN": 16.08,
-          "TN5K": 14.96
+          "TN5K": 14.96,
+          "Zhujiang2K": 14.57
         },
         "ThyroidXAgent": {
           "TN3K": 10.31,
-          "Augtrain": 1.92,
+          "Shanghai7K": 1.92,
           "ThyroidXL": 5.43,
           "PKTN": 9.01,
-          "TN5K": 10.12
+          "TN5K": 10.12,
+          "Zhujiang2K": 0.36
         }
       }
     }
