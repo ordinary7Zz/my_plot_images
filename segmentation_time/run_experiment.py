@@ -75,25 +75,24 @@ def generate_experiment_config(
     if not images:
         raise ValueError(f"No images found in {image_dir}")
 
-    # 匹配 mask
+    # 匹配 mask (按图像 stem 匹配, 不要求后缀一致)
     mask_dir_path = Path(mask_dir)
     image_mask_pairs = []
+    img_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
     for img_path in images:
         stem = img_path.stem
-        # 尝试多种 mask 命名方式
-        candidates = [
-            mask_dir_path / f"{stem}_mask.png",
-            mask_dir_path / f"{stem}.png",
-            mask_dir_path / f"{stem}_pred.png",
-        ]
         found = None
-        for c in candidates:
-            if c.exists():
-                found = str(c)
-                break
+        if mask_dir_path.exists():
+            for ext in img_exts:
+                candidate = mask_dir_path / f"{stem}{ext}"
+                if candidate.exists():
+                    found = str(candidate)
+                    break
+        if found is None:
+            print(f"  [WARN] No mask found for: {img_path.name}")
         image_mask_pairs.append({
             "image": str(img_path),
-            "mask": found,  # None 如果没有预分割 mask
+            "mask": found,
         })
 
     # 对每位标注者, 随机分配图像到手动组和辅助组
@@ -215,22 +214,26 @@ def get_annotator_script() -> str:
 
 
 def get_pending_tasks(config: Dict, annotator: Optional[str] = None) -> List[Dict]:
-    """获取待完成的标注任务"""
-    completed_images = set()
+    """获取待完成的标注任务
+
+    每个 (annotator, image_name) 对唯一标识一个任务。
+    在交叉设计中，每位标注者对每张图只标注一次。
+    """
+    completed = set()
     log_file = config.get("log_file", "")
     if log_file and os.path.exists(log_file):
         with open(log_file, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 if row.get("finished") == "True":
-                    key = (row.get("annotator", ""), row.get("image_name", ""), row.get("mode", ""))
-                    completed_images.add(key)
+                    key = (row.get("annotator", ""), row.get("image_name", ""))
+                    completed.add(key)
 
     pending = []
     for task in config["tasks"]:
         img_name = os.path.basename(task["image"])
-        key = (task["annotator"], img_name, task["mode"])
-        if key not in completed_images:
+        key = (task["annotator"], img_name)
+        if key not in completed:
             pending.append(task)
 
     if annotator:
