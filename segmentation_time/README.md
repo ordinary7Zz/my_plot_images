@@ -15,12 +15,12 @@ datasets/
     └── ...
 
 segmentation_time/
-├── annotator.py                        # 核心标注工具 (多边形轮廓 + 画笔)
-├── generate_masks.py                   # 批量推理生成预分割 mask
-├── run_experiment.py                   # 实验运行脚本 (交叉设计、断点续传)
-├── analyze_results.py                  # 统计分析 (检验 + 图表 + LaTeX 表格)
-├── plot_case_time_saving_standalone.py # 时间效率可视化 (三子图 b/c/d + 组合图)
-└── README.md                           # 本文档
+├── annotator.py                 # 核心标注工具 (多边形轮廓 + 画笔)
+├── generate_masks.py            # 批量推理生成预分割 mask
+├── run_experiment.py            # 实验运行脚本 (交叉设计、断点续传)
+├── analyze_results.py           # 时间效率统计 (检验 + 图表 + LaTeX)
+├── compute_segmentation_metrics.py # 分割性能对比图 (Dice 箱线图 + 配对散点)
+└── README.md                    # 本文档
 ```
 
 ---
@@ -58,11 +58,18 @@ python run_experiment.py run --config experiment_single/experiment_config.json
 # Round 2: 继续运行 (AI辅助标注, 断点续传自动接上)
 python run_experiment.py run --config experiment_single/experiment_config.json
 
-# 统计分析 (按图像配对检验)
+# 时间效率统计分析
 python analyze_results.py --log experiment_single/experiment_log.csv --output-dir ./analysis
+
+# 分割性能对比图 (Dice: 人工 vs AI辅助 vs GT)
+python compute_segmentation_metrics.py \
+    --log experiment_single/experiment_log.csv \
+    --mask-dir experiment_single/masks \
+    --gt-dir datasets/gt \
+    --output-dir ./figures
 ```
 
-> **单人实验要点**: Round 2 图像顺序与 Round 1 不同（已自动打乱），洗脱期 ≥ 1 周避免记忆效应。分析时使用配对 Wilcoxon signed-rank 检验。
+> **单人实验要点**: 洗脱期 ≥ 1 周避免记忆效应。分析时使用配对 Wilcoxon signed-rank 检验。
 
 ---
 
@@ -282,7 +289,27 @@ python plot_case_time_saving_standalone.py \
 
 ---
 
-## 六、实验设计要点
+## 六、分割性能对比图 (compute_segmentation_metrics.py)
+
+### 输出
+
+| 输出 | 说明 |
+|------|------|
+| `segmentation_quality.png/pdf/svg` | 左: Dice 箱线图 + 散点 + 配对连线; 右: 配对散点图 + y=x 对角线; 底: 统计文字 |
+
+### 使用
+
+```bash
+python compute_segmentation_metrics.py \
+    --log experiment_single/experiment_log.csv \
+    --mask-dir experiment_single/masks \
+    --gt-dir datasets/gt \
+    --output-dir ./figures
+```
+
+---
+
+## 七、实验设计要点
 
 ### 参与者
 - 多人: 2-3 人 (推荐交叉设计)
