@@ -37,7 +37,8 @@ MAX_UNDO_STEPS = 200
 DEFAULT_BRUSH_SIZE = 3
 BRUSH_MIN, BRUSH_MAX = 1, 50
 MASK_ALPHA = 0.45
-MASK_COLOR = (0, 0, 255)          # mask 区域红色
+MASK_COLOR = (0, 0, 255)          # mask 区域红色 (BGR)
+GT_COLOR = (255, 0, 0)            # GT mask 蓝色 (BGR)
 CONTOUR_COLOR = (0, 255, 0)       # 多边形轮廓绿色
 VERTEX_COLOR = (0, 255, 255)      # 顶点黄色
 SELECTED_COLOR = (0, 165, 255)    # 选中顶点橙色
@@ -88,6 +89,7 @@ class MaskAnnotator:
         self,
         image_path: str,
         mask_path: Optional[str] = None,
+        gt_path: Optional[str] = None,
         window_name: str = "Segmentation Annotator",
         brush_size: int = DEFAULT_BRUSH_SIZE,
         mask_alpha: float = MASK_ALPHA,
@@ -100,6 +102,17 @@ class MaskAnnotator:
             raise ValueError(f"无法读取图像: {image_path}")
         self.orig_h, self.orig_w = self.img.shape[:2]
         self.image_name = os.path.basename(image_path)
+
+        # ---- GT mask (只读参考) ----
+        self.gt_mask: Optional[np.ndarray] = None
+        self.has_gt = False
+        if gt_path and os.path.exists(gt_path):
+            raw = cv2.imread(gt_path, cv2.IMREAD_GRAYSCALE)
+            if raw is not None:
+                if raw.shape[:2] != (self.orig_h, self.orig_w):
+                    raw = cv2.resize(raw, (self.orig_w, self.orig_h))
+                self.gt_mask = ((raw > 128).astype(np.uint8)) * 255
+                self.has_gt = True
 
         # ---- 模式 ----
         self.annotation_mode = "manual"     # "manual" | "assisted"
@@ -163,10 +176,19 @@ class MaskAnnotator:
         # ---- 窗口 ----
         self.window_name = window_name
         cv2.namedWindow(window_name, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-        if self.orig_h > 800:
+        if self.has_gt:
+            # 左右并排: 显示宽度翻倍
+            win_w = self.orig_w * 2
+            win_h = self.orig_h + BAR_HEIGHT
+            if win_h > 900:
+                scale = 900 / win_h
+                win_w = int(win_w * scale)
+                win_h = 900
+            cv2.resizeWindow(window_name, win_w, win_h)
+        elif self.orig_h > 800:
             cv2.resizeWindow(window_name, int(self.orig_w * 0.7), int(self.orig_h * 0.7))
         else:
-            cv2.resizeWindow(window_name, self.orig_w, self.orig_h)
+            cv2.resizeWindow(window_name, self.orig_w, self.orig_h + BAR_HEIGHT)
         cv2.setMouseCallback(window_name, self._on_mouse)
 
     # ===================== 初始化辅助 =====================
@@ -250,6 +272,9 @@ class MaskAnnotator:
     # ===================== 鼠标事件路由 =====================
 
     def _on_mouse(self, event, x, y, flags, param):
+        # GT 并排模式: 右半边只读, 忽略鼠标事件
+        if self.has_gt and x >= self.orig_w:
+            return
         if self.input_mode == "polygon":
             self._on_mouse_polygon(event, x, y, flags)
         else:
@@ -420,37 +445,48 @@ class MaskAnnotator:
     # ===================== 显示 =====================
 
     def _render(self) -> np.ndarray:
-        """渲染图像 + mask + 多边形叠加"""
-        overlay = self.img.copy()
+        """渲染图像 + mask + 多边形叠加 (有 GT 时左右并排)"""
+        # 左半边: 工作区 (标注 mask + 顶点)
+        left = self._render_pane(self.mask, MASK_COLOR, show_vertices=True)
+        # 左半边标题
+        cv2.putText(left, "YOURS", (8, 20),
+                    BAR_FONT, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
 
-        # 绘制 mask (半透明红色)
-        overlay[self.mask > 0] = MASK_COLOR
-        display = cv2.addWeighted(self.img, 1 - self.mask_alpha, overlay, self.mask_alpha, 0)
-
-        # 多边形模式下绘制轮廓和顶点
-        if self.input_mode == "polygon" and self.vertices:
-            pts = np.array(self.vertices, dtype=np.int32).reshape((-1, 1, 2))
-
-            # 绘制边
-            if self.polygon_closed:
-                cv2.polylines(display, [pts], True, CONTOUR_COLOR, 2)
-            elif len(self.vertices) >= 2:
-                cv2.polylines(display, [pts], False, CONTOUR_COLOR, 2)
-                # 绘制最后一点到鼠标的虚线（在run中处理）
-
-            # 绘制顶点
-            for i, (vx, vy) in enumerate(self.vertices):
-                color = SELECTED_COLOR if i == self.selected_idx else VERTEX_COLOR
-                radius = SELECTED_RADIUS if i == self.selected_idx else VERTEX_RADIUS
-                cv2.circle(display, (vx, vy), radius, color, -1)
-                cv2.circle(display, (vx, vy), radius, (0, 0, 0), 1)
-
-            # 高亮 hover 顶点
-            if self.hover_idx >= 0 and self.hover_idx != self.selected_idx:
-                vx, vy = self.vertices[self.hover_idx]
-                cv2.circle(display, (vx, vy), VERTEX_RADIUS + 2, (255, 255, 255), 2)
+        if self.has_gt:
+            # 右半边: GT 参考 (GT mask, 蓝色, 不显示顶点)
+            right = self._render_pane(self.gt_mask, GT_COLOR, show_vertices=False)
+            cv2.putText(right, "GT", (8, 20),
+                        BAR_FONT, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+            # 中间分隔线
+            cv2.line(left, (self.orig_w - 1, 0), (self.orig_w - 1, self.orig_h - 1), (255, 255, 255), 1)
+            display = np.hstack([left, right])
+        else:
+            display = left
 
         return display
+
+    def _render_pane(self, mask: np.ndarray, color: tuple, show_vertices: bool) -> np.ndarray:
+        """渲染单个面板: 原图 + mask 叠加 + 可选多边形顶点"""
+        overlay = self.img.copy()
+        overlay[mask > 0] = color
+        pane = cv2.addWeighted(self.img, 1 - self.mask_alpha, overlay, self.mask_alpha, 0)
+
+        if show_vertices and self.input_mode == "polygon" and self.vertices:
+            pts = np.array(self.vertices, dtype=np.int32).reshape((-1, 1, 2))
+            if self.polygon_closed:
+                cv2.polylines(pane, [pts], True, CONTOUR_COLOR, 2)
+            elif len(self.vertices) >= 2:
+                cv2.polylines(pane, [pts], False, CONTOUR_COLOR, 2)
+            for i, (vx, vy) in enumerate(self.vertices):
+                vc = SELECTED_COLOR if i == self.selected_idx else VERTEX_COLOR
+                vr = SELECTED_RADIUS if i == self.selected_idx else VERTEX_RADIUS
+                cv2.circle(pane, (vx, vy), vr, vc, -1)
+                cv2.circle(pane, (vx, vy), vr, (0, 0, 0), 1)
+            if self.hover_idx >= 0 and self.hover_idx != self.selected_idx:
+                vx, vy = self.vertices[self.hover_idx]
+                cv2.circle(pane, (vx, vy), VERTEX_RADIUS + 2, (255, 255, 255), 2)
+
+        return pane
 
     def _status_text(self) -> List[str]:
         """状态栏信息"""
@@ -498,7 +534,10 @@ class MaskAnnotator:
                         cv2.LINE_AA)
 
         # 图例 (右下角)
-        lx = bw - 290
+        if self.has_gt:
+            lx = bw - 335
+        else:
+            lx = bw - 290
         ly = BAR_HEIGHT - 30
         cv2.line(bar, (lx, ly), (lx + 32, ly), CONTOUR_COLOR, 2)
         cv2.putText(bar, "contour", (lx + 38, ly + 5),
@@ -509,6 +548,10 @@ class MaskAnnotator:
         cv2.rectangle(bar, (lx + 188, ly - 6), (lx + 206, ly + 6), MASK_COLOR, -1)
         cv2.putText(bar, "mask", (lx + 212, ly + 5),
                     BAR_FONT, 0.35, BAR_FG, 1, cv2.LINE_AA)
+        if self.has_gt:
+            cv2.rectangle(bar, (lx + 255, ly - 6), (lx + 273, ly + 6), GT_COLOR, -1)
+            cv2.putText(bar, "GT", (lx + 279, ly + 5),
+                        BAR_FONT, 0.35, BAR_FG, 1, cv2.LINE_AA)
 
         return np.vstack([display, bar])
 
@@ -703,6 +746,8 @@ def main():
                         help="原始图像路径")
     parser.add_argument("--mask", default=None,
                         help="预分割 mask 路径 (不提供则为纯人工模式)")
+    parser.add_argument("--gt", default=None,
+                        help="GT mask 路径 (右侧参考显示, 只读)")
     parser.add_argument("--output-mask", default=None,
                         help="修正后 mask 保存路径")
     parser.add_argument("--output-log", default=None,
@@ -717,6 +762,7 @@ def main():
     editor = MaskAnnotator(
         image_path=args.image,
         mask_path=args.mask,
+        gt_path=args.gt,
         brush_size=args.brush_size,
     )
     result = editor.run(output_mask_path=args.output_mask)

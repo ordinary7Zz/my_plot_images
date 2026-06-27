@@ -62,6 +62,7 @@ def generate_experiment_config(
     num_images: int = 30,
     random_seed: int = 42,
     cross_over: bool = True,
+    gt_dir: Optional[str] = None,
 ) -> Dict:
     """
     生成实验配置
@@ -82,33 +83,44 @@ def generate_experiment_config(
     if not images:
         raise ValueError(f"No images found in {image_dir}")
 
-    # 匹配 mask (按图像 stem 匹配, 不要求后缀一致)
+    # 匹配 mask + GT (按图像 stem 匹配, 不要求后缀一致)
     mask_dir_path = Path(mask_dir)
-    image_mask_pairs = []
+    gt_dir_path = Path(gt_dir) if gt_dir else None
+    image_pairs = []
     img_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
     for img_path in images:
         stem = img_path.stem
-        found = None
+        mask_found = None
+        gt_found = None
         if mask_dir_path.exists():
             for ext in img_exts:
                 candidate = mask_dir_path / f"{stem}{ext}"
                 if candidate.exists():
-                    found = str(candidate)
+                    mask_found = str(candidate)
                     break
-        if found is None:
+        if mask_found is None:
             print(f"  [WARN] No mask found for: {img_path.name}")
-        image_mask_pairs.append({
+        if gt_dir_path and gt_dir_path.exists():
+            for ext in img_exts:
+                candidate = gt_dir_path / f"{stem}{ext}"
+                if candidate.exists():
+                    gt_found = str(candidate)
+                    break
+            if gt_found is None:
+                print(f"  [WARN] No GT found for: {img_path.name}")
+        image_pairs.append({
             "image": str(img_path),
-            "mask": found,
+            "mask": mask_found,
+            "gt": gt_found,
         })
 
     # 对每位标注者, 按文件名排序分配图像 (无随机)
-    total = len(image_mask_pairs)
+    total = len(image_pairs)
     task_list = []
 
     for annotator in annotators:
         # 保持文件名排序
-        ordered = image_mask_pairs
+        ordered = image_pairs
 
         if cross_over:
             half = total // 2
@@ -123,6 +135,7 @@ def generate_experiment_config(
                     "mode": "manual",
                     "image": item["image"],
                     "mask": None,
+                    "gt": item["gt"],
                 })
             # 第二轮: 辅助组
             for item in assisted_group:
@@ -132,6 +145,7 @@ def generate_experiment_config(
                     "mode": "assisted",
                     "image": item["image"],
                     "mask": item["mask"],
+                    "gt": item["gt"],
                 })
         else:
             # 简单分组: 所有图像先手动, 后辅助 (同序)
@@ -142,6 +156,7 @@ def generate_experiment_config(
                     "mode": "manual",
                     "image": item["image"],
                     "mask": None,
+                    "gt": item["gt"],
                 })
             for item in ordered:
                 task_list.append({
@@ -150,6 +165,7 @@ def generate_experiment_config(
                     "mode": "assisted",
                     "image": item["image"],
                     "mask": item["mask"],
+                    "gt": item["gt"],
                 })
 
     # 保存配置
@@ -161,9 +177,10 @@ def generate_experiment_config(
         "created_at": datetime.now().isoformat(),
         "image_dir": os.path.abspath(image_dir),
         "mask_dir": os.path.abspath(mask_dir),
+        "gt_dir": os.path.abspath(gt_dir) if gt_dir else None,
         "output_dir": str(output_dir),
         "annotators": annotators,
-        "num_images_total": len(image_mask_pairs),
+        "num_images_total": len(image_pairs),
         "cross_over": cross_over,
         "random_seed": random_seed,
         "tasks": task_list,
@@ -265,6 +282,8 @@ def run_single_task(task: Dict, config: Dict):
     ]
     if task.get("mask"):
         cmd.extend(["--mask", task["mask"]])
+    if task.get("gt"):
+        cmd.extend(["--gt", task["gt"]])
 
     print(f"\n{'='*60}")
     print(f"  TASK")
@@ -399,6 +418,7 @@ def main():
     gen = sub.add_parser("generate-config", help="生成实验配置")
     gen.add_argument("--image-dir", required=True, help="原始图像目录")
     gen.add_argument("--mask-dir", required=True, help="预分割 mask 目录")
+    gen.add_argument("--gt-dir", default=None, help="GT mask 目录 (右侧参考)")
     gen.add_argument("--output-dir", required=True, help="实验输出目录")
     gen.add_argument("--annotators", nargs="+", required=True,
                      help="标注者 ID 列表 (如 alice bob)")
@@ -430,6 +450,7 @@ def main():
             num_images=args.num_images,
             random_seed=args.seed,
             cross_over=not args.no_cross_over,
+            gt_dir=args.gt_dir,
         )
 
     elif args.command == "run":

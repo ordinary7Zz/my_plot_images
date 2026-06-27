@@ -7,8 +7,11 @@ datasets/
 ├── images/          # 原始超声图像
 │   ├── TN3K_test_0000.jpg
 │   └── ...
-└── masks/           # 预分割 mask（由模型生成）
-    ├── TN3K_test_0000_mask.png
+├── masks/           # 预分割 mask（由模型生成）
+│   ├── TN3K_test_0000.jpg
+│   └── ...
+└── gt/              # GT mask（人工标注金标准, 右侧参考）
+    ├── TN3K_test_0000.jpg
     └── ...
 
 segmentation_time/
@@ -29,14 +32,20 @@ segmentation_time/
 同一人对同一批图像做两轮: Round 1 全手动 → 洗脱期 ≥ 1 周 → Round 2 全辅助。
 
 ```bash
-# 生成配置 (单人 + --no-cross-over, 所有图做两轮)
+# 生成配置 (单人 + GT 参考)
 python run_experiment.py generate-config \
-    --image-dir ./datasets/images --mask-dir ./datasets/masks \
+    --image-dir ./datasets/images \
+    --mask-dir ./datasets/masks \
+    --gt-dir ./datasets/gt \
     --annotators alice \
     --output-dir ./experiment_single \
     --no-cross-over
+
+# Windows 示例
 python run_experiment.py generate-config ^
-    --image-dir ./datasets/images --mask-dir ./datasets/masks ^
+    --image-dir ./datasets/images ^
+    --mask-dir ./datasets/masks ^
+    --gt-dir ./datasets/gt ^
     --annotators alice ^
     --output-dir ./experiment_single ^
     --no-cross-over
@@ -51,11 +60,6 @@ python run_experiment.py run --config experiment_single/experiment_config.json
 
 # 统计分析 (按图像配对检验)
 python analyze_results.py --log experiment_single/experiment_log.csv --output-dir ./analysis
-
-# 时间效率可视化
-python plot_case_time_saving_standalone.py \
-    --input experiment_single/experiment_log.csv \
-    --output-dir ./figures
 ```
 
 > **单人实验要点**: Round 2 图像顺序与 Round 1 不同（已自动打乱），洗脱期 ≥ 1 周避免记忆效应。分析时使用配对 Wilcoxon signed-rank 检验。
@@ -76,6 +80,10 @@ python plot_case_time_saving_standalone.py \
 **AI辅助模式:**
 - 模型预分割 mask 自动提取为多边形轮廓
 - 标注者直接拖拽顶点调整边界即可（无需从零描点）
+
+**GT 参考模式 (`--gt` 或 `--gt-dir`):**
+- 窗口左右并排: 左侧 YOURS (可编辑) | 右侧 GT (蓝色只读)
+- 鼠标仅在左侧工作区操作，右侧仅供对比参考
 
 **画笔模式 (Tab 切换):**
 - 左键涂抹 / 右键擦除
@@ -98,12 +106,18 @@ python plot_case_time_saving_standalone.py \
 ### 使用
 
 ```bash
-# AI 辅助模式
+# AI 辅助 + GT 参考
 python annotator.py --image datasets/images/patient_001.png \
-    --mask datasets/masks/patient_001_mask.png \
+    --mask datasets/masks/patient_001.jpg \
+    --gt datasets/gt/patient_001.jpg \
     --annotator alice --output-log experiment_log.csv
 
-# 纯人工模式
+# 纯人工 + GT 参考
+python annotator.py --image datasets/images/patient_001.png \
+    --gt datasets/gt/patient_001.jpg \
+    --annotator alice --output-log experiment_log.csv
+
+# 无 GT（单面板）
 python annotator.py --image datasets/images/patient_001.png \
     --annotator alice --output-log experiment_log.csv
 ```
@@ -153,15 +167,23 @@ python generate_masks.py \
 ### 子命令
 
 ```bash
-# 生成配置
+# 生成配置 (含 GT 参考)
 python run_experiment.py generate-config \
     --image-dir ./datasets/images \
     --mask-dir ./datasets/masks \
+    --gt-dir ./datasets/gt \
     --annotators alice bob \
     --output-dir ./experiment_001 \
     --num-images 30 --seed 42
 
-# 单人模式
+# 单人模式 (含 GT)
+python run_experiment.py generate-config \
+    --image-dir ./datasets/images \
+    --mask-dir ./datasets/masks \
+    --gt-dir ./datasets/gt \
+    --annotators alice --output-dir ./experiment_single --no-cross-over
+
+# 无 GT (单面板, 向后兼容)
 python run_experiment.py generate-config \
     --image-dir ./datasets/images --mask-dir ./datasets/masks \
     --annotators alice --output-dir ./experiment_single --no-cross-over
