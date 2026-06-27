@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-人工 vs AI辅助 分割时间效率可视化 — 完整三子图 + 组合图
-=========================================================
+人工 vs AI辅助 分割时间效率可视化 — 三个独立子图
+=================================================
 
 用途:
-    对比人工手动分割 vs AI辅助分割的时间效率，生成四个独立图表(单位: 秒):
+    对比人工手动分割 vs AI辅助分割的时间效率，生成三个独立图表(单位: 秒):
 
     子图 b — "Segmentation time" (分割耗时分布对比):
         小提琴图 + 箱线图 + 散点叠加，对比 Manual vs AI 的分割耗时分布。
@@ -22,8 +22,6 @@
         使用 Bootstrap (5000次) 计算 95% 置信区间。
         标注每个标注者的节省百分比、秒数和 AI 更快占比。
 
-    组合图 b+c+d — 三子图水平并排。
-
 数据来源:
     读取 annotator.py / run_experiment.py 输出的实验日志 CSV
     (每行一次标注任务，包含 annotator, image_name, mode, time_seconds)，
@@ -31,11 +29,10 @@
     (manual_time_sec vs ai_time_sec)，
     并从日志的 annotator 列提取 ai_physician 用于分层分析。
 
-输出文件 (均为 PNG/PDF/SVG 三种格式):
-    {stem}_b_segmentation_time.png/.pdf/.svg       — 子图 b: 分割耗时分布
-    {stem}_c_case_time_saving.png/.pdf/.svg        — 子图 c: 病例级时间节省
-    {stem}_d_annotator_time_saving.png/.pdf/.svg   — 子图 d: 标注者分层
-    {stem}_bcd_combined.png/.pdf/.svg              — 三子图组合
+输出文件 (SVG 不含文字, PNG 完整):
+    {stem}_b_segmentation_time.svg/.png       — 子图 b: 分割耗时分布
+    {stem}_c_case_time_saving.svg/.png        — 子图 c: 病例级时间节省
+    {stem}_d_annotator_time_saving.svg/.png   — 子图 d: 标注者分层
 
 使用示例:
     # 默认路径 (读取 ./experiment_log.csv, 输出到 ./output/)
@@ -105,22 +102,45 @@ def clean_ax(ax: plt.Axes) -> None:
     ax.grid(axis="x", visible=False)
 
 
-def add_panel_label(ax: plt.Axes, label: str, x: float = -0.10, y: float = 1.08) -> None:
-    """在左上角添加子图标签 (如 b, c, d)"""
-    ax.text(
-        x, y, label,
-        transform=ax.transAxes,
-        fontsize=20, fontweight="bold",
-        ha="left", va="top", color="black",
-    )
 
+def save_svg_then_png(fig: plt.Figure, output_dir: Path, stem: str, png_dpi: int = 450) -> None:
+    """保存 SVG (不含所有文字) 和 PNG (完整内容)"""
+    import matplotlib.text as mtext
 
-def save_figure_formats(fig: plt.Figure, output_dir: Path, stem: str) -> None:
-    """保存图表为 PNG (450 DPI), PDF, SVG 三种格式"""
     output_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_dir / f"{stem}.png", dpi=450, bbox_inches="tight")
-    fig.savefig(output_dir / f"{stem}.pdf", bbox_inches="tight")
+
+    # 收集图中所有文字元素
+    text_artists = set()
+    for ax in fig.axes:
+        text_artists.update(ax.texts)
+        text_artists.update(ax.get_xticklabels())
+        text_artists.update(ax.get_yticklabels())
+        if ax.xaxis.label:
+            text_artists.add(ax.xaxis.label)
+        if ax.yaxis.label:
+            text_artists.add(ax.yaxis.label)
+        if ax.title:
+            text_artists.add(ax.title)
+        legend = ax.get_legend()
+        if legend:
+            text_artists.update(legend.get_texts())
+    # fig.text 元素
+    for child in fig.get_children():
+        if isinstance(child, mtext.Text) and child not in text_artists:
+            text_artists.add(child)
+
+    # 隐藏文字 -> 保存 SVG
+    for t in text_artists:
+        t.set_visible(False)
     fig.savefig(output_dir / f"{stem}.svg", bbox_inches="tight")
+
+    # 恢复文字 -> 保存 PNG
+    for t in text_artists:
+        t.set_visible(True)
+    fig.savefig(output_dir / f"{stem}.png", dpi=png_dpi, bbox_inches="tight")
+
+    print(f"[PLOT] {output_dir / f'{stem}.svg'}")
+    print(f"[PLOT] {output_dir / f'{stem}.png'}")
 
 
 def format_p_value(p_value: float) -> str:
@@ -280,9 +300,8 @@ def physician_saving_summary(by_case: pd.DataFrame) -> pd.DataFrame:
 # 子图 b: Segmentation time — 分割耗时分布对比 (小提琴图+箱线图)
 # ============================================================
 
-def draw_segmentation_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "b", clip_min: float = 30.0) -> None:
+def draw_segmentation_time(ax: plt.Axes, by_case: pd.DataFrame, clip_min: float = 30.0) -> None:
     """绘制 Manual vs AI 分割耗时的小提琴图 + 箱线图 + 散点叠加 (单位: 秒)"""
-    add_panel_label(ax, panel_label, x=-0.12, y=1.08)
     manual = by_case["manual_time_sec"].to_numpy(dtype=float)
     ai = by_case["ai_time_sec"].to_numpy(dtype=float)
     data = [manual, ai]
@@ -377,9 +396,8 @@ def draw_segmentation_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str
 # 子图 c: Within-case time saving — 病例级时间节省柱状图
 # ============================================================
 
-def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "c") -> None:
+def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame) -> None:
     """绘制每个病例的时间节省柱状图 (Manual - AI 耗时, 单位: 秒)"""
-    add_panel_label(ax, panel_label)
     paired = by_case.copy()
     paired["saving_sec"] = paired["manual_time_sec"] - paired["ai_time_sec"]
     paired = paired.sort_values("saving_sec").reset_index(drop=True)
@@ -419,9 +437,8 @@ def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str 
 # 子图 d: Annotator-stratified time saving — 标注者分层对比
 # ============================================================
 
-def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "d") -> None:
+def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame) -> None:
     """按标注者分层展示分割时间减少百分比 (带 Bootstrap 95% CI)"""
-    add_panel_label(ax, panel_label, x=-0.16, y=1.08)
     summary = physician_saving_summary(by_case)
 
     # 自动为不同的标注者分配颜色和标记
@@ -475,33 +492,20 @@ def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label:
 # ============================================================
 
 def draw_all_panels(by_case: pd.DataFrame, output_dir: Path, stem: str) -> None:
-    """生成三个独立子图 + 一个三合一组图, 每个输出 PNG/PDF/SVG"""
-    # 三个独立子图
+    """生成三个独立子图, 每个输出 SVG (无文字) + PNG"""
     specs = [
         (f"{stem}_b_segmentation_time", (4.6, 3.35),
-         lambda ax: draw_segmentation_time(ax, by_case, "b")),
+         lambda ax: draw_segmentation_time(ax, by_case)),
         (f"{stem}_c_case_time_saving", (5.2, 3.15),
-         lambda ax: draw_case_time_saving(ax, by_case, "c")),
+         lambda ax: draw_case_time_saving(ax, by_case)),
         (f"{stem}_d_annotator_time_saving", (4.15, 3.05),
-         lambda ax: draw_physician_time_saving(ax, by_case, "d")),
+         lambda ax: draw_physician_time_saving(ax, by_case)),
     ]
     for output_stem, figsize, drawer in specs:
         fig, ax = plt.subplots(figsize=figsize, facecolor="white")
         drawer(ax)
-        save_figure_formats(fig, output_dir, output_stem)
+        save_svg_then_png(fig, output_dir, output_stem)
         plt.close(fig)
-
-    # 三子图水平组合
-    fig, axes = plt.subplots(
-        1, 3, figsize=(14.4, 3.45), facecolor="white",
-        gridspec_kw={"width_ratios": [1.08, 1.22, 1.08]},
-    )
-    draw_segmentation_time(axes[0], by_case, "b")
-    draw_case_time_saving(axes[1], by_case, "c")
-    draw_physician_time_saving(axes[2], by_case, "d")
-    fig.subplots_adjust(wspace=0.44)
-    save_figure_formats(fig, output_dir, f"{stem}_bcd_combined")
-    plt.close(fig)
 
 
 # ============================================================
@@ -510,7 +514,7 @@ def draw_all_panels(by_case: pd.DataFrame, output_dir: Path, stem: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="绘制人工 vs AI辅助分割时间效率对比图 (子图 b/c/d + 组合图)。"
+        description="绘制人工 vs AI辅助分割时间效率对比图 (三个独立子图 b/c/d)。"
                     "输入为 annotator.py / run_experiment.py 输出的实验日志 CSV。"
     )
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT,
@@ -531,9 +535,9 @@ def main() -> None:
 
     by_case = load_paired_cases(args.input)
     draw_all_panels(by_case, args.output_dir, args.stem)
-    print(f"\nWrote b/c/d panel exports (PNG/PDF/SVG) to {args.output_dir}")
+    print(f"\nWrote b/c/d panel exports (SVG/PNG) to {args.output_dir}")
     print(f"  Stem prefix: {args.stem}")
-    print(f"  Total: 4 figures × 3 formats = 12 files")
+    print(f"  Total: 3 figures × 2 formats = 6 files")
 
 
 if __name__ == "__main__":

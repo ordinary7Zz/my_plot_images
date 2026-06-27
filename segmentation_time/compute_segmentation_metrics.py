@@ -1,22 +1,48 @@
 #!/usr/bin/env python3
 """
-分割性能对比图 — 人工 vs AI辅助标注 vs GT
-===========================================
-读取实验日志 CSV, 加载 corrected mask 和 GT, 生成:
-  - 左: Dice 箱线图 + 个体散点
-  - 右: 配对散点图 (Manual vs Assisted, y=x 对角线)
-  - 底: 统计文字 (均值、p值、优于/持平比例)
+================================================================================
+ 分割性能对比图 — 人工标注 vs AI辅助标注的分割质量评估
+================================================================================
 
-输出: PDF + PNG + SVG
+ 背景与目的:
+   在医学图像分割任务中, 需要量化评估 AI 辅助标注是否能达到与纯人工标注
+   相当的精度。本脚本通过对比同一病例在"纯人工"和"AI辅助"两种模式下的
+   标注结果与金标准 (GT) 之间的 Dice 相似系数, 生成直观的可视化对比图。
 
-使用方式:
-  python compute_segmentation_metrics.py \
-      --log experiment_single/experiment_log.csv \
-      --mask-dir experiment_single/masks \
-      --gt-dir datasets/gt \
-      --output-dir ./figures
+ 核心流程:
+   1. 读取实验日志 CSV (由 annotator.py 输出), 提取已完成任务
+   2. 将每条日志按 (标注者, 图像名) 配对, 得到 manual / assisted 两种模式
+   3. 加载对应模式的 corrected mask 和 GT mask
+   4. 逐对计算 Dice 相似系数: Dice = 2 * |pred ∩ gt| / (|pred| + |gt|)
+   5. 生成两张独立图形: 箱线图 (Dice Distribution) 和配对散点图 (Paired Comparison)
+   6. 使用 Wilcoxon signed-rank 检验评估两种模式的差异显著性
+   7. 输出 SVG (不含文字, 仅图形元素) 和 PNG (完整内容) 两种格式
 
-依赖: pip install opencv-python numpy scipy matplotlib
+ 输出图形内容 (两张独立图, 均含底部统计栏):
+   图 1 — "Dice Distribution" ({prefix}_boxplot):
+     - 橙色/蓝色箱线图: Manual / AI-Assisted 的 Dice 分布概况
+     - 橙色/蓝色散点: 每个病例的原始 Dice 值, 水平随机抖动避免重叠
+     - 灰色配对连线: 同一病例在两种模式下的 Dice 变化方向
+     - Y 轴范围 0.5–1.0, 聚焦高质量分割区间
+
+   图 2 — "Paired Comparison" ({prefix}_scatter):
+     - 散点图: X=Manual Dice, Y=AI-Assisted Dice
+     - 红色虚线 y=x: 对角线, 点在上方 = AI 优于手动
+     - 坐标轴等比例, 直观对比两种模式的相对表现
+
+   底部统计栏 (两张图均有):
+     - 样本量 n, 均值 μ, 标准差 σ
+     - Wilcoxon signed-rank 检验 p 值及显著性标注
+     - AI-Assisted 不低于 Manual 的病例占比
+
+ 使用方式:
+   python compute_segmentation_metrics.py \
+       --log experiment_single/experiment_log.csv \
+       --mask-dir experiment_single/masks \
+       --gt-dir datasets/gt \
+       --output-dir ./figures
+
+ 依赖: pip install opencv-python numpy scipy matplotlib
 """
 
 import os
@@ -43,6 +69,28 @@ except ImportError:
 # 中文字体
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
+
+# ============================================================
+# 可调视觉参数 — 圆点大小与透明度
+# ============================================================
+# 左面板箱线图上的 jitter 散点
+SCATTER_ALPHA_BOXPLOT = 0.8   # 散点透明度 (0=全透明, 1=不透明)
+SCATTER_SIZE_BOXPLOT  = 35     # 散点大小 (单位: 磅^2)
+
+# 右面板配对散点图
+SCATTER_ALPHA_PAIRED  = 0.8    # 散点透明度
+SCATTER_SIZE_PAIRED   = 45     # 散点大小
+
+# jitter 随机偏移与配对连线
+JITTER_STD            = 0.04   # 水平随机抖动的标准差
+PAIR_LINE_ALPHA       = 0.2    # 配对连线透明度
+PAIR_LINE_WIDTH       = 0.6    # 配对连线宽度
+
+# 箱线图线条与填充
+BOX_ALPHA             = 0.7    # 箱体填充透明度
+BOX_LINE_WIDTH        = 1.0    # 箱体边框 / 须线宽度
+MEDIAN_LINE_WIDTH     = 1.5    # 中位数线宽度
+GRID_ALPHA            = 0.3    # 网格线透明度
 
 
 # ============================================================
@@ -138,6 +186,46 @@ def compute_paired_dice(log_rows: List[Dict], mask_dir: str, gt_dir: str
 # 绘图
 # ============================================================
 
+def save_svg_then_png(fig: plt.Figure, output_dir: Path, stem: str, png_dpi: int = 200) -> None:
+    """保存 SVG (不含所有文字) 和 PNG (完整内容)"""
+    import matplotlib.text as mtext
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # 收集图中所有文字元素
+    text_artists = set()
+    for ax in fig.axes:
+        text_artists.update(ax.texts)
+        text_artists.update(ax.get_xticklabels())
+        text_artists.update(ax.get_yticklabels())
+        if ax.xaxis.label:
+            text_artists.add(ax.xaxis.label)
+        if ax.yaxis.label:
+            text_artists.add(ax.yaxis.label)
+        if ax.title:
+            text_artists.add(ax.title)
+        legend = ax.get_legend()
+        if legend:
+            text_artists.update(legend.get_texts())
+    # fig.text 元素
+    for child in fig.get_children():
+        if isinstance(child, mtext.Text) and child not in text_artists:
+            text_artists.add(child)
+
+    # 隐藏文字 -> 保存 SVG
+    for t in text_artists:
+        t.set_visible(False)
+    fig.savefig(output_dir / f"{stem}.svg", bbox_inches="tight")
+
+    # 恢复文字 -> 保存 PNG
+    for t in text_artists:
+        t.set_visible(True)
+    fig.savefig(output_dir / f"{stem}.png", dpi=png_dpi, bbox_inches="tight")
+
+    print(f"[PLOT] {output_dir / f'{stem}.svg'}")
+    print(f"[PLOT] {output_dir / f'{stem}.png'}")
+
+
 def plot_segmentation_quality(results: List[Dict], output_dir: str,
                                prefix: str = "segmentation_quality"):
     output_dir = Path(output_dir)
@@ -167,40 +255,63 @@ def plot_segmentation_quality(results: List[Dict], output_dir: str,
         except Exception:
             pass
 
-    # ---- 创建图形 ----
-    fig = plt.figure(figsize=(12, 5.5))
+    # ---- 统计文字 (两个图共用) ----
+    summary_lines = [
+        f"n = {n} images",
+        f"Manual: $\\mu$={m_mean:.4f}, $\\sigma$={np.std(manual, ddof=1):.4f}",
+        f"AI-Assisted: $\\mu$={a_mean:.4f}, $\\sigma$={np.std(assisted, ddof=1):.4f}",
+        f"Assisted $\\geq$ Manual on {same_or_better}/{n} images ({100*same_or_better/n:.0f}%)",
+    ]
+    if p_val_str:
+        summary_lines.insert(3, f"Wilcoxon signed-rank: {p_val_str}")
+    summary_text = " | ".join(summary_lines)
 
-    # ==== 左: 箱线图 + 散点 ====
-    ax1 = fig.add_subplot(1, 2, 1)
+    # ---- 图 1: 箱线图 (Dice Distribution) ----
+    fig1 = plt.figure(figsize=(3.8, 4.5))
+    ax1 = fig1.add_subplot(1, 1, 1)
     data = [manual, assisted]
     bp = ax1.boxplot(data, labels=["Manual", "AI-Assisted"],
                      patch_artist=True, widths=0.45, showfliers=False,
-                     medianprops={"color": "black", "linewidth": 1.5})
+                     medianprops={"color": "black", "linewidth": MEDIAN_LINE_WIDTH},
+                     boxprops={"linewidth": BOX_LINE_WIDTH},
+                     whiskerprops={"linewidth": BOX_LINE_WIDTH},
+                     capprops={"linewidth": BOX_LINE_WIDTH})
     bp["boxes"][0].set_facecolor(color_manual)
-    bp["boxes"][0].set_alpha(0.7)
+    bp["boxes"][0].set_alpha(BOX_ALPHA)
     bp["boxes"][1].set_facecolor(color_assist)
-    bp["boxes"][1].set_alpha(0.7)
+    bp["boxes"][1].set_alpha(BOX_ALPHA)
 
     # jitter 散点
     for i, vals in enumerate(data):
-        jitter = np.random.normal(0, 0.04, len(vals))
+        jitter = np.random.normal(0, JITTER_STD, len(vals))
         x = np.ones(len(vals)) * (i + 1) + jitter
         c = color_manual if i == 0 else color_assist
-        ax1.scatter(x, vals, alpha=0.55, s=22, c=c, edgecolors="white", linewidth=0.3, zorder=5)
+        ax1.scatter(x, vals, alpha=SCATTER_ALPHA_BOXPLOT, s=SCATTER_SIZE_BOXPLOT,
+                    c=c, edgecolors="white", linewidth=0.3, zorder=5)
 
     # 配对连线
     for m_val, a_val in zip(manual, assisted):
-        ax1.plot([1, 2], [m_val, a_val], color="gray", alpha=0.2, linewidth=0.6, zorder=1)
+        ax1.plot([1, 2], [m_val, a_val], color="gray",
+                 alpha=PAIR_LINE_ALPHA, linewidth=PAIR_LINE_WIDTH, zorder=1)
 
     ax1.set_ylabel("Dice Score", fontsize=11)
     ax1.set_title("Dice Distribution", fontsize=12, fontweight="bold")
-    ax1.set_ylim(min(0.0, np.min(data) - 0.05), 1.0)
-    ax1.grid(axis="y", alpha=0.3)
+    ax1.set_ylim(min(0.5, np.min(data) - 0.05), 1.0)
+    ax1.grid(axis="y", alpha=GRID_ALPHA)
     ax1.tick_params(labelsize=10)
 
-    # ==== 右: 配对散点 ====
-    ax2 = fig.add_subplot(1, 2, 2)
-    ax2.scatter(manual, assisted, c="#333333", alpha=0.6, s=40,
+    fig1.text(0.5, 0.01, summary_text,
+              ha="center", va="bottom", fontsize=9,
+              bbox=dict(boxstyle="round,pad=0.4", facecolor="#f5f5f5", edgecolor="#cccccc"))
+    fig1.subplots_adjust(bottom=0.16, top=0.94)
+    save_svg_then_png(fig1, output_dir, f"{prefix}_boxplot")
+    plt.close(fig1)
+
+    # ---- 图 2: 配对散点图 (Paired Comparison) ----
+    fig2 = plt.figure(figsize=(5.0, 5.0))
+    ax2 = fig2.add_subplot(1, 1, 1)
+    ax2.scatter(manual, assisted, c="#333333",
+                alpha=SCATTER_ALPHA_PAIRED, s=SCATTER_SIZE_PAIRED,
                 edgecolors="white", linewidth=0.3, zorder=5)
 
     lim_min = max(0.0, min(np.min(manual), np.min(assisted)) - 0.03)
@@ -215,34 +326,15 @@ def plot_segmentation_quality(results: List[Dict], output_dir: str,
     ax2.set_ylim(lim_min, lim_max)
     ax2.set_aspect("equal")
     ax2.legend(fontsize=9, loc="lower right")
-    ax2.grid(alpha=0.3)
+    ax2.grid(alpha=GRID_ALPHA)
     ax2.tick_params(labelsize=10)
 
-    # ==== 底部统计文字 ====
-    summary_lines = [
-        f"n = {n} images",
-        f"Manual: $\\mu$={m_mean:.4f}, $\\sigma$={np.std(manual, ddof=1):.4f}",
-        f"AI-Assisted: $\\mu$={a_mean:.4f}, $\\sigma$={np.std(assisted, ddof=1):.4f}",
-        f"Assisted $\\ge$ Manual on {same_or_better}/{n} images ({100*same_or_better/n:.0f}%)",
-    ]
-    if p_val_str:
-        summary_lines.insert(3, f"Wilcoxon signed-rank: {p_val_str}")
-
-    fig.text(0.5, 0.01, " | ".join(summary_lines),
-             ha="center", va="bottom", fontsize=9,
-             bbox=dict(boxstyle="round,pad=0.4", facecolor="#f5f5f5", edgecolor="#cccccc"))
-
-    plt.subplots_adjust(bottom=0.14, top=0.92, wspace=0.35)
-    plt.suptitle("Segmentation Quality: Manual vs AI-Assisted Annotation",
-                 fontsize=13, fontweight="bold", y=0.97)
-
-    # ---- 保存 ----
-    for fmt in ("png", "pdf", "svg"):
-        path = output_dir / f"{prefix}.{fmt}"
-        plt.savefig(path, dpi=200, bbox_inches="tight")
-        print(f"[PLOT] {path}")
-
-    plt.close()
+    fig2.text(0.5, 0.01, summary_text,
+              ha="center", va="bottom", fontsize=9,
+              bbox=dict(boxstyle="round,pad=0.4", facecolor="#f5f5f5", edgecolor="#cccccc"))
+    fig2.subplots_adjust(bottom=0.16, top=0.94)
+    save_svg_then_png(fig2, output_dir, f"{prefix}_scatter")
+    plt.close(fig2)
 
 
 # ============================================================

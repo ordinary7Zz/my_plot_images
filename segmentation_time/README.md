@@ -238,14 +238,13 @@ python analyze_results.py \
 
 ### 功能
 
-生成 **三个子图 + 一个组合图**，完整展示人工 vs AI辅助分割的时间效率对比:
+生成 **三个独立子图**，完整展示人工 vs AI辅助分割的时间效率对比:
 
 | 子图 | 标题 | 内容 |
 |------|------|------|
 | b | Segmentation time | 小提琴图 + 箱线图 + 散点，对比 Manual vs AI 分割耗时分布 (秒)，标注缩短百分比和 P 值 |
 | c | Within-case time saving | 病例级柱状图，绿色 = AI更快，红色 = AI更慢，橙色虚线 = 均值 (秒) |
 | d | Annotator-stratified time saving | 按标注者分层展示分割时间减少百分比，含 Bootstrap 95% 置信区间 |
-| bcd | 三子图组合 | b/c/d 水平并排 |
 
 ### 数据来源
 
@@ -278,14 +277,15 @@ python plot_case_time_saving_standalone.py \
 | `--output-dir` | `output/` | 输出目录，自动创建 |
 | `--stem` | `segmentation_efficiency` | 输出文件名前缀 |
 
-### 输出 (4 图表 × 3 格式 = 12 文件)
+### 输出 (3 图表 × 2 格式 = 6 文件)
+
+SVG 格式不含文字（仅图形元素），PNG 格式包含完整内容。
 
 | 文件（以默认 stem 为例） | 说明 |
 |------|------|
-| `segmentation_efficiency_b_segmentation_time.{png,pdf,svg}` | 子图 b: 分割耗时分布 |
-| `segmentation_efficiency_c_case_time_saving.{png,pdf,svg}` | 子图 c: 病例级时间节省 |
-| `segmentation_efficiency_d_annotator_time_saving.{png,pdf,svg}` | 子图 d: 标注者分层 |
-| `segmentation_efficiency_bcd_combined.{png,pdf,svg}` | 三子图组合 |
+| `segmentation_efficiency_b_segmentation_time.{svg,png}` | 子图 b: 分割耗时分布 |
+| `segmentation_efficiency_c_case_time_saving.{svg,png}` | 子图 c: 病例级时间节省 |
+| `segmentation_efficiency_d_annotator_time_saving.{svg,png}` | 子图 d: 标注者分层 |
 
 ---
 
@@ -293,9 +293,11 @@ python plot_case_time_saving_standalone.py \
 
 ### 输出
 
+SVG 格式不含文字（仅图形元素），PNG 格式包含完整内容。Dice 箱线图 Y 轴范围 0.5–1.0。
+
 | 输出 | 说明 |
 |------|------|
-| `segmentation_quality.png/pdf/svg` | 左: Dice 箱线图 + 散点 + 配对连线; 右: 配对散点图 + y=x 对角线; 底: 统计文字 |
+| `segmentation_quality.{svg,png}` | 左: Dice 箱线图 + 散点 + 配对连线; 右: 配对散点图 + y=x 对角线; 底: 统计文字 |
 
 ### 使用
 
