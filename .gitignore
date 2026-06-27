@@ -40,3 +40,4 @@ claude/*
 .matplotlib/*
 
 !experiment_single/*
+!experiment_single/*/**
