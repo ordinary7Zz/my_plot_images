@@ -37,14 +37,21 @@ from collections import defaultdict
 # 配置生成
 # ============================================================
 
+def _natural_key(path: Path) -> tuple:
+    """自然排序键: 将文件名中的数字段转为整数, 其余保持字符串"""
+    import re
+    name = path.stem
+    return tuple(int(s) if s.isdigit() else s.lower() for s in re.split(r'(\d+)', name))
+
+
 def find_images_in_dir(image_dir: str, exts=(".png", ".jpg", ".jpeg", ".bmp")):
-    """查找目录下的图像文件"""
+    """查找目录下的图像文件 (自然排序)"""
     image_dir = Path(image_dir)
     images = []
     for ext in exts:
-        images.extend(sorted(image_dir.glob(f"*{ext}")))
-        images.extend(sorted(image_dir.glob(f"*{ext.upper()}")))
-    return sorted(set(images))
+        images.extend(image_dir.glob(f"*{ext}"))
+        images.extend(image_dir.glob(f"*{ext.upper()}"))
+    return sorted(set(images), key=_natural_key)
 
 
 def generate_experiment_config(

@@ -80,14 +80,21 @@ def model_inference(image_path: str) -> np.ndarray:
 # 批量推理
 # ============================================================
 
+def _natural_key(path: Path) -> tuple:
+    """自然排序键"""
+    import re
+    name = path.stem
+    return tuple(int(s) if s.isdigit() else s.lower() for s in re.split(r'(\d+)', name))
+
+
 def find_images(image_dir: str, extensions=(".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff")):
-    """递归查找所有图像文件"""
+    """递归查找所有图像文件 (自然排序)"""
     image_dir = Path(image_dir).expanduser().resolve()
     images = []
     for ext in extensions:
         images.extend(image_dir.rglob(f"*{ext}"))
         images.extend(image_dir.rglob(f"*{ext.upper()}"))
-    return sorted(set(images))
+    return sorted(set(images), key=_natural_key)
 
 
 def run_batch_inference(
