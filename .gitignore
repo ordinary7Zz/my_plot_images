@@ -38,3 +38,6 @@ __pycache__/
 claude/*
 
 .matplotlib/*
+
+# 保留 experiment_single 下的所有文件
+!experiment_single/**
