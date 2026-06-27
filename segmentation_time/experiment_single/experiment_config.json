@@ -1,6 +1,6 @@
 {
   "experiment_id": "experiment_single",
-  "created_at": "2026-06-27T15:24:42.762749",
+  "created_at": "2026-06-27T16:05:40.282995",
   "image_dir": "D:\\workspace\\ThyroidAgent\\my_plot_images\\segmentation_time\\datasets\\images",
   "mask_dir": "D:\\workspace\\ThyroidAgent\\my_plot_images\\segmentation_time\\datasets\\masks",
   "gt_dir": "D:\\workspace\\ThyroidAgent\\my_plot_images\\segmentation_time\\datasets\\gt",
