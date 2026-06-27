@@ -5,22 +5,22 @@
 =========================================================
 
 用途:
-    对比人工手动分割 vs AI辅助分割的时间效率，生成四个独立图表:
+    对比人工手动分割 vs AI辅助分割的时间效率，生成四个独立图表(单位: 秒):
 
-    子图 b — "Reporting time" (报告耗时分布对比):
-        小提琴图 + 箱线图 + 散点叠加，对比 Manual vs AI 的耗时分布。
+    子图 b — "Segmentation time" (分割耗时分布对比):
+        小提琴图 + 箱线图 + 散点叠加，对比 Manual vs AI 的分割耗时分布。
         散点 = 配对病例，菱形 = 均值，三角 = 超出上限的离群值带标签。
         标注缩短百分比和配对 t 检验 P 值。
 
     子图 c — "Within-case time saving" (病例级时间节省):
         每个病例为一个柱子的条形图，按节省时间升序排列。
         绿色 = AI 更快，红色 = 纯人工更快，橙色虚线 = 平均节省时间。
-        标注总体缩短百分比、平均节省分钟数、AI 更快占比。
+        标注总体缩短百分比、平均节省秒数、AI 更快占比。
 
-    子图 d — "Physician-stratified acceleration" (标注者分层分析):
-        按标注者 (Overall / 各标注者ID) 分组展示报告时间减少百分比。
+    子图 d — "Annotator-stratified time saving" (标注者分层分析):
+        按标注者 (Overall / 各标注者ID) 分组展示分割时间减少百分比。
         使用 Bootstrap (5000次) 计算 95% 置信区间。
-        标注每个标注者的节省百分比、分钟数和 AI 更快占比。
+        标注每个标注者的节省百分比、秒数和 AI 更快占比。
 
     组合图 b+c+d — 三子图水平并排。
 
@@ -32,10 +32,10 @@
     并从日志的 annotator 列提取 ai_physician 用于分层分析。
 
 输出文件 (均为 PNG/PDF/SVG 三种格式):
-    {stem}_b_reporting_time.png/.pdf/.svg       — 子图 b: 报告耗时分布
-    {stem}_c_case_time_saving.png/.pdf/.svg      — 子图 c: 病例级时间节省
-    {stem}_d_physician_time_saving.png/.pdf/.svg — 子图 d: 标注者分层
-    {stem}_bcd_combined.png/.pdf/.svg            — 三子图组合
+    {stem}_b_segmentation_time.png/.pdf/.svg       — 子图 b: 分割耗时分布
+    {stem}_c_case_time_saving.png/.pdf/.svg        — 子图 c: 病例级时间节省
+    {stem}_d_annotator_time_saving.png/.pdf/.svg   — 子图 d: 标注者分层
+    {stem}_bcd_combined.png/.pdf/.svg              — 三子图组合
 
 使用示例:
     # 默认路径 (读取 ./experiment_log.csv, 输出到 ./output/)
@@ -242,13 +242,13 @@ def physician_saving_summary(by_case: pd.DataFrame) -> pd.DataFrame:
     """按标注者分层汇总时间节省指标。
 
     返回每行对应一个标注者 (含 Overall 总体), 包含:
-        mean_saving_min, ci_low, ci_high, reduction_pct,
+        mean_saving_sec, ci_low, ci_high, reduction_pct,
         reduction_ci_low, reduction_ci_high, ai_faster_pct
     """
     paired = by_case.copy()
-    paired["manual_min"] = paired["manual_time_sec"].to_numpy(dtype=float) / 60
-    paired["ai_min"] = paired["ai_time_sec"].to_numpy(dtype=float) / 60
-    paired["saving_min"] = paired["manual_min"] - paired["ai_min"]
+    paired["manual_sec"] = paired["manual_time_sec"].to_numpy(dtype=float)
+    paired["ai_sec"] = paired["ai_time_sec"].to_numpy(dtype=float)
+    paired["saving_sec"] = paired["manual_sec"] - paired["ai_sec"]
 
     groups: list[tuple[str, pd.DataFrame]] = [("Overall", paired)]
     if "ai_physician" in paired.columns:
@@ -258,14 +258,14 @@ def physician_saving_summary(by_case: pd.DataFrame) -> pd.DataFrame:
 
     rows = []
     for idx, (physician, group) in enumerate(groups):
-        saving = group["saving_min"].to_numpy(dtype=float)
-        manual = group["manual_min"].to_numpy(dtype=float)
-        ai = group["ai_min"].to_numpy(dtype=float)
+        saving = group["saving_sec"].to_numpy(dtype=float)
+        manual = group["manual_sec"].to_numpy(dtype=float)
+        ai = group["ai_sec"].to_numpy(dtype=float)
         ci_low, ci_high = bootstrap_mean_ci(saving, seed=20260619 + idx)
         reduction_ci_low, reduction_ci_high = bootstrap_reduction_ci(manual, ai, seed=20260619 + idx)
         rows.append({
             "physician": physician,
-            "mean_saving_min": float(saving.mean()),
+            "mean_saving_sec": float(saving.mean()),
             "ci_low": ci_low,
             "ci_high": ci_high,
             "reduction_pct": float(saving.mean() / manual.mean() * 100) if manual.mean() > 0 else 0.0,
@@ -277,14 +277,14 @@ def physician_saving_summary(by_case: pd.DataFrame) -> pd.DataFrame:
 
 
 # ============================================================
-# 子图 b: Reporting time — 报告耗时分布对比 (小提琴图+箱线图)
+# 子图 b: Segmentation time — 分割耗时分布对比 (小提琴图+箱线图)
 # ============================================================
 
-def draw_reporting_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "b", clip_min: float = 8.0) -> None:
-    """绘制 Manual vs AI 报告耗时的小提琴图 + 箱线图 + 散点叠加"""
+def draw_segmentation_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "b", clip_min: float = 30.0) -> None:
+    """绘制 Manual vs AI 分割耗时的小提琴图 + 箱线图 + 散点叠加 (单位: 秒)"""
     add_panel_label(ax, panel_label, x=-0.12, y=1.08)
-    manual = by_case["manual_time_sec"].to_numpy(dtype=float) / 60
-    ai = by_case["ai_time_sec"].to_numpy(dtype=float) / 60
+    manual = by_case["manual_time_sec"].to_numpy(dtype=float)
+    ai = by_case["ai_time_sec"].to_numpy(dtype=float)
     data = [manual, ai]
     colors = [MANUAL, AI]
 
@@ -312,9 +312,9 @@ def draw_reporting_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = 
 
     # 散点 (配对病例) + 底部菱形 (均值)
     rng = np.random.default_rng(42)
-    top_y = clip_min - 0.38
+    top_y = clip_min - 0.38 * (clip_min / 8.0)  # 按比例缩放 top 空白区
     for x_pos, values, color in zip([0, 1], data, colors):
-        jitter = rng.normal(0, 0.058, len(values))
+        jitter = rng.normal(0, 0.058 * (clip_min / 8.0), len(values))
         in_range = values <= clip_min
         ax.scatter(
             np.full(in_range.sum(), x_pos) + jitter[in_range], values[in_range],
@@ -333,7 +333,7 @@ def draw_reporting_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = 
                 zorder=5, clip_on=False,
             )
             for value in clipped_values:
-                ax.text(label_x, top_y, f"{value:.1f} min",
+                ax.text(label_x, top_y, f"{value:.1f} s",
                         ha="left", va="center", fontsize=7.0,
                         color=GREY, fontweight="bold")
         ax.scatter([x_pos], [np.mean(values)],
@@ -352,23 +352,23 @@ def draw_reporting_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = 
             [bracket_y - tick, bracket_y, bracket_y, bracket_y - tick],
             color=DARK, linewidth=0.9)
     ax.text(0.5, bracket_y + clip_min * 0.025,
-            f"{reduction:.1f}% shorter reporting time",
+            f"{reduction:.1f}% shorter segmentation time",
             ha="center", va="bottom", fontsize=8.4,
             fontweight="bold", color=ORANGE)
 
-    ax.set_title("Reporting time", fontsize=11, fontweight="bold", pad=17)
+    ax.set_title("Segmentation time", fontsize=11, fontweight="bold", pad=17)
     ax.text(0.5, 1.01,
-            f"{manual.mean():.1f} -> {ai.mean():.1f} min; {speedup:.2f}x faster{p_label}",
+            f"{manual.mean():.1f} -> {ai.mean():.1f} s; {speedup:.2f}x faster{p_label}",
             transform=ax.transAxes, ha="center", va="bottom",
             fontsize=8.2, color=GREY)
     ax.set_xticks([0, 1], [f"Manual\nn={len(manual)}", f"AI-Assisted\nn={len(ai)}"])
-    ax.set_ylabel("Reporting time (min)")
+    ax.set_ylabel("Segmentation time (s)")
     ax.set_xlim(-0.55, 1.55)
     ax.set_ylim(0, clip_min)
-    ax.set_yticks(np.arange(0, clip_min + 0.1, 2))
+    ax.set_yticks(np.arange(0, clip_min + 0.1, clip_min / 4))
     clean_ax(ax)
     ax.text(0.98, -0.22,
-            f"Dots, paired cases; diamonds, means. Top triangles show values >{clip_min:g} min.",
+            f"Dots, paired cases; diamonds, means. Top triangles show values >{clip_min:g} s.",
             transform=ax.transAxes, ha="right", va="top",
             fontsize=7.0, color=GREY)
 
@@ -378,26 +378,26 @@ def draw_reporting_time(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = 
 # ============================================================
 
 def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "c") -> None:
-    """绘制每个病例的时间节省柱状图 (Manual - AI 时间)"""
+    """绘制每个病例的时间节省柱状图 (Manual - AI 耗时, 单位: 秒)"""
     add_panel_label(ax, panel_label)
     paired = by_case.copy()
-    paired["saving_min"] = (paired["manual_time_sec"] - paired["ai_time_sec"]) / 60
-    paired = paired.sort_values("saving_min").reset_index(drop=True)
+    paired["saving_sec"] = paired["manual_time_sec"] - paired["ai_time_sec"]
+    paired = paired.sort_values("saving_sec").reset_index(drop=True)
 
-    values = paired["saving_min"].to_numpy(dtype=float)
+    values = paired["saving_sec"].to_numpy(dtype=float)
     x = np.arange(len(values))
     colors = np.where(values >= 0, AI, RED)
     mean_saving = float(values.mean())
     ai_faster_pct = float((values > 0).mean() * 100)
-    manual_mean_min = float(paired["manual_time_sec"].mean() / 60)
-    mean_reduction_pct = mean_saving / manual_mean_min * 100 if manual_mean_min > 0 else 0.0
+    manual_mean_sec = float(paired["manual_time_sec"].mean())
+    mean_reduction_pct = mean_saving / manual_mean_sec * 100 if manual_mean_sec > 0 else 0.0
 
     ax.bar(x, values, color=colors, width=0.86, linewidth=0)
     ax.axhline(0, color=DARK, linewidth=1.0)
     ax.axhline(mean_saving, color=ORANGE, linewidth=1.1, linestyle="--")
     ax.text(
-        len(values) * 0.61, mean_saving + 0.34,
-        f"{mean_reduction_pct:.1f}% shorter overall\n{mean_saving:.1f} min/case saved",
+        len(values) * 0.03, mean_saving + 0.34,
+        f"{mean_reduction_pct:.1f}% shorter overall\n{mean_saving:.1f} s/case saved",
         ha="left", va="bottom", fontsize=7.7,
         color=ORANGE, fontweight="bold", linespacing=0.95,
     )
@@ -407,7 +407,7 @@ def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str 
             f"AI faster in {ai_faster_pct:.1f}% of paired cases",
             transform=ax.transAxes, ha="center", va="bottom",
             fontsize=8.3, color=GREY)
-    ax.set_ylabel("Manual − AI time (min)")
+    ax.set_ylabel("Manual \u2212 AI time (s)")
     ax.set_xlabel("Paired cases sorted by time saving")
     ax.set_xticks([])
     ax.set_xlim(-1, len(values))
@@ -416,11 +416,11 @@ def draw_case_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str 
 
 
 # ============================================================
-# 子图 d: Physician-stratified acceleration — 标注者分层对比
+# 子图 d: Annotator-stratified time saving — 标注者分层对比
 # ============================================================
 
 def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label: str = "d") -> None:
-    """按标注者分层展示报告时间减少百分比 (带 Bootstrap 95% CI)"""
+    """按标注者分层展示分割时间减少百分比 (带 Bootstrap 95% CI)"""
     add_panel_label(ax, panel_label, x=-0.16, y=1.08)
     summary = physician_saving_summary(by_case)
 
@@ -454,7 +454,7 @@ def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label:
                 ha="center", va="bottom", fontsize=8.5,
                 fontweight="bold", color=color)
         ax.text(x_pos, -0.07,
-                f"{row['mean_saving_min']:.1f} min/case\n{row['ai_faster_pct']:.1f}% faster",
+                f"{row['mean_saving_sec']:.1f} s/case\n{row['ai_faster_pct']:.1f}% faster",
                 transform=ax.get_xaxis_transform(),
                 ha="center", va="top", fontsize=6.45,
                 color=GREY, linespacing=0.96, clip_on=False)
@@ -465,8 +465,8 @@ def draw_physician_time_saving(ax: plt.Axes, by_case: pd.DataFrame, panel_label:
     ax.set_xticks(x_positions, summary["physician"].tolist())
     ax.tick_params(axis="x", length=0, pad=35, labelsize=8)
     ax.set_yticks(np.arange(0, upper_limit + 0.1, 10))
-    ax.set_ylabel("Reporting time reduction (%)", fontsize=8.4)
-    ax.set_title("Annotator-stratified acceleration", fontsize=10.5, fontweight="bold", pad=9)
+    ax.set_ylabel("Segmentation time reduction (%)", fontsize=8.4)
+    ax.set_title("Annotator-stratified time saving", fontsize=10.5, fontweight="bold", pad=9)
     clean_ax(ax)
 
 
@@ -478,11 +478,11 @@ def draw_all_panels(by_case: pd.DataFrame, output_dir: Path, stem: str) -> None:
     """生成三个独立子图 + 一个三合一组图, 每个输出 PNG/PDF/SVG"""
     # 三个独立子图
     specs = [
-        (f"{stem}_b_reporting_time", (4.6, 3.35),
-         lambda ax: draw_reporting_time(ax, by_case, "b")),
+        (f"{stem}_b_segmentation_time", (4.6, 3.35),
+         lambda ax: draw_segmentation_time(ax, by_case, "b")),
         (f"{stem}_c_case_time_saving", (5.2, 3.15),
          lambda ax: draw_case_time_saving(ax, by_case, "c")),
-        (f"{stem}_d_physician_time_saving", (4.15, 3.05),
+        (f"{stem}_d_annotator_time_saving", (4.15, 3.05),
          lambda ax: draw_physician_time_saving(ax, by_case, "d")),
     ]
     for output_stem, figsize, drawer in specs:
@@ -496,7 +496,7 @@ def draw_all_panels(by_case: pd.DataFrame, output_dir: Path, stem: str) -> None:
         1, 3, figsize=(14.4, 3.45), facecolor="white",
         gridspec_kw={"width_ratios": [1.08, 1.22, 1.08]},
     )
-    draw_reporting_time(axes[0], by_case, "b")
+    draw_segmentation_time(axes[0], by_case, "b")
     draw_case_time_saving(axes[1], by_case, "c")
     draw_physician_time_saving(axes[2], by_case, "d")
     fig.subplots_adjust(wspace=0.44)

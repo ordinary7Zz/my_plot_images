@@ -235,9 +235,9 @@ python analyze_results.py \
 
 | 子图 | 标题 | 内容 |
 |------|------|------|
-| b | Reporting time | 小提琴图 + 箱线图 + 散点，对比 Manual vs AI 耗时分布，标注缩短百分比和 P 值 |
-| c | Within-case time saving | 病例级柱状图，绿色 = AI更快，红色 = AI更慢，橙色虚线 = 均值 |
-| d | Annotator-stratified acceleration | 按标注者分层展示时间减少百分比，含 Bootstrap 95% 置信区间 |
+| b | Segmentation time | 小提琴图 + 箱线图 + 散点，对比 Manual vs AI 分割耗时分布 (秒)，标注缩短百分比和 P 值 |
+| c | Within-case time saving | 病例级柱状图，绿色 = AI更快，红色 = AI更慢，橙色虚线 = 均值 (秒) |
+| d | Annotator-stratified time saving | 按标注者分层展示分割时间减少百分比，含 Bootstrap 95% 置信区间 |
 | bcd | 三子图组合 | b/c/d 水平并排 |
 
 ### 数据来源
@@ -254,12 +254,12 @@ python plot_case_time_saving_standalone.py
 
 # 指定输入文件和输出目录
 python plot_case_time_saving_standalone.py \
-    --input experiment_001/experiment_log.csv \
+    --input experiment_single/experiment_log.csv \
     --output-dir ./figures
 
 # 自定义输出文件名前缀
 python plot_case_time_saving_standalone.py \
-    --input experiment_001/experiment_log.csv \
+    --input experiment_single/experiment_log.csv \
     --stem my_experiment
 ```
 
@@ -275,9 +275,9 @@ python plot_case_time_saving_standalone.py \
 
 | 文件（以默认 stem 为例） | 说明 |
 |------|------|
-| `segmentation_efficiency_b_reporting_time.{png,pdf,svg}` | 子图 b: 报告耗时分布 |
+| `segmentation_efficiency_b_segmentation_time.{png,pdf,svg}` | 子图 b: 分割耗时分布 |
 | `segmentation_efficiency_c_case_time_saving.{png,pdf,svg}` | 子图 c: 病例级时间节省 |
-| `segmentation_efficiency_d_physician_time_saving.{png,pdf,svg}` | 子图 d: 标注者分层 |
+| `segmentation_efficiency_d_annotator_time_saving.{png,pdf,svg}` | 子图 d: 标注者分层 |
 | `segmentation_efficiency_bcd_combined.{png,pdf,svg}` | 三子图组合 |
 
 ---
