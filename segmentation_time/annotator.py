@@ -45,6 +45,14 @@ VERTEX_RADIUS = 5
 SELECTED_RADIUS = 7
 SNAP_RADIUS = 8                   # 点击捕捉顶点距离
 
+# 状态栏配置
+BAR_HEIGHT = 130
+BAR_LINE_SPACING = 25
+BAR_FONT_SCALE = 0.45
+BAR_FONT_THICKNESS = 1
+BAR_BG = (40, 40, 40)
+BAR_FG = (210, 210, 210)
+
 # 轮廓简化参数
 CONTOUR_EPSILON = 0.003           # approxPolyDP 精度 (相对周长)
 MAX_CONTOUR_VERTICES = 30         # 从mask提取的最多顶点数
@@ -449,18 +457,22 @@ class MaskAnnotator:
         mins, secs = divmod(int(elapsed), 60)
         mode_str = "AI-Assisted" if self.annotation_mode == "assisted" else "Pure Manual"
         input_str = "Polygon" if self.input_mode == "polygon" else "Brush"
-        pause_str = " [PAUSED]" if self.is_paused else ""
-        closed_str = " [CLOSED]" if self.polygon_closed else ""
+        tags = []
+        if self.is_paused:
+            tags.append("PAUSED")
+        if self.input_mode == "polygon" and self.polygon_closed:
+            tags.append("CLOSED")
+        tag_str = " [" + " | ".join(tags) + "]" if tags else ""
 
         lines = [
-            f"Mode: {mode_str} | Input: {input_str}{closed_str}{pause_str}",
+            f"Mode: {mode_str} | Input: {input_str}{tag_str}",
             f"Time: {mins:02d}:{secs:02d}",
         ]
 
         if self.input_mode == "polygon":
             lines.append(
-                f"Vertices: {len(self.vertices)} | +{self.vertex_adds} / -{self.vertex_deletes} / ~{self.vertex_drags}"
-                f" | Undo: {self.undo_count}"
+                f"Verts: {len(self.vertices)} | +{self.vertex_adds} / -{self.vertex_deletes}"
+                f" / ~{self.vertex_drags} | Undo: {self.undo_count}"
             )
         else:
             lines.append(
@@ -468,33 +480,33 @@ class MaskAnnotator:
                 f" | Undo: {self.undo_count}"
             )
 
-        lines.append(
-            f"Mask: {int((self.mask > 0).sum())} px"
-        )
+        lines.append(f"Mask: {int((self.mask > 0).sum())} px")
         return lines
 
     def _draw_status_bar(self, display: np.ndarray) -> np.ndarray:
-        bar_h = 110
-        h, w = display.shape[:2]
-        bar = np.zeros((bar_h, w, 3), dtype=np.uint8)
-        bar[:] = (40, 40, 40)
+        bw = display.shape[1]
+        bar = np.zeros((BAR_HEIGHT, bw, 3), dtype=np.uint8)
+        bar[:] = BAR_BG
 
         lines = self._status_text()
         for i, line in enumerate(lines):
-            cv2.putText(bar, line, (12, 20 + i * 22),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+            y = int(18 + i * BAR_LINE_SPACING)
+            cv2.putText(bar, line, (12, y),
+                        BAR_FONT, BAR_FONT_SCALE, BAR_FG, BAR_FONT_THICKNESS,
+                        cv2.LINE_AA)
 
-        # 图例
-        cx = w - 340
-        cv2.circle(bar, (cx, 18), 5, VERTEX_COLOR, -1)
-        cv2.putText(bar, "= vertex", (cx + 12, 24),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-        cv2.line(bar, (cx + 100, 18), (cx + 130, 18), CONTOUR_COLOR, 2)
-        cv2.putText(bar, "= contour", (cx + 136, 24),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
-        cv2.rectangle(bar, (cx + 215, 10), (cx + 233, 26), MASK_COLOR, -1)
-        cv2.putText(bar, "= mask", (cx + 239, 24),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 200, 200), 1)
+        # 图例 (右下角)
+        lx = bw - 290
+        ly = BAR_HEIGHT - 30
+        cv2.line(bar, (lx, ly), (lx + 32, ly), CONTOUR_COLOR, 2)
+        cv2.putText(bar, "contour", (lx + 38, ly + 5),
+                    BAR_FONT, 0.35, BAR_FG, 1, cv2.LINE_AA)
+        cv2.circle(bar, (lx + 118, ly), 4, VERTEX_COLOR, -1)
+        cv2.putText(bar, "vertex", (lx + 128, ly + 5),
+                    BAR_FONT, 0.35, BAR_FG, 1, cv2.LINE_AA)
+        cv2.rectangle(bar, (lx + 188, ly - 6), (lx + 206, ly + 6), MASK_COLOR, -1)
+        cv2.putText(bar, "mask", (lx + 212, ly + 5),
+                    BAR_FONT, 0.35, BAR_FG, 1, cv2.LINE_AA)
 
         return np.vstack([display, bar])
 
