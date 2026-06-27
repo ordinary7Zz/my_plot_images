@@ -95,19 +95,18 @@ def generate_experiment_config(
             "mask": found,
         })
 
-    # 对每位标注者, 随机分配图像到手动组和辅助组
+    # 对每位标注者, 按文件名排序分配图像 (无随机)
     total = len(image_mask_pairs)
     task_list = []
 
     for annotator in annotators:
-        # 打乱图像顺序
-        shuffled = image_mask_pairs.copy()
-        random.shuffle(shuffled)
+        # 保持文件名排序
+        ordered = image_mask_pairs
 
         if cross_over:
             half = total // 2
-            manual_group = shuffled[:half]
-            assisted_group = shuffled[half:]
+            manual_group = ordered[:half]
+            assisted_group = ordered[half:]
 
             # 第一轮: 手动组
             for item in manual_group:
@@ -116,7 +115,7 @@ def generate_experiment_config(
                     "round": 1,
                     "mode": "manual",
                     "image": item["image"],
-                    "mask": None,  # 纯手动不用 mask
+                    "mask": None,
                 })
             # 第二轮: 辅助组
             for item in assisted_group:
@@ -128,8 +127,8 @@ def generate_experiment_config(
                     "mask": item["mask"],
                 })
         else:
-            # 简单分组: 所有图像都做手动, 所有图像都做辅助
-            for item in shuffled:
+            # 简单分组: 所有图像先手动, 后辅助 (同序)
+            for item in ordered:
                 task_list.append({
                     "annotator": annotator,
                     "round": 1,
@@ -137,10 +136,7 @@ def generate_experiment_config(
                     "image": item["image"],
                     "mask": None,
                 })
-            # 打乱后第二轮
-            shuffled2 = image_mask_pairs.copy()
-            random.shuffle(shuffled2)
-            for item in shuffled2:
+            for item in ordered:
                 task_list.append({
                     "annotator": annotator,
                     "round": 2,

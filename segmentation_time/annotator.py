@@ -466,6 +466,7 @@ class MaskAnnotator:
         tag_str = " [" + " | ".join(tags) + "]" if tags else ""
 
         lines = [
+            f"Image: {self.image_name}",
             f"Mode: {mode_str} | Input: {input_str}{tag_str}",
             f"Time: {mins:02d}:{secs:02d}",
         ]
