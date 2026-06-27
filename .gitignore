@@ -37,6 +37,4 @@ __pycache__/
 
 claude/*
 
-datasets/*
-
 .matplotlib/*
