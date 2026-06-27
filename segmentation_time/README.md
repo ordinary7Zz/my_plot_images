@@ -12,35 +12,17 @@ datasets/
     └── ...
 
 segmentation_time/
-├── annotator.py          # 核心标注工具 (多边形轮廓 + 画笔)
-├── generate_masks.py     # 批量推理生成预分割 mask
-├── run_experiment.py     # 实验运行脚本 (交叉设计、断点续传)
-├── analyze_results.py    # 统计分析 (检验 + 图表 + LaTeX 表格)
-└── README.md             # 本文档
+├── annotator.py                        # 核心标注工具 (多边形轮廓 + 画笔)
+├── generate_masks.py                   # 批量推理生成预分割 mask
+├── run_experiment.py                   # 实验运行脚本 (交叉设计、断点续传)
+├── analyze_results.py                  # 统计分析 (检验 + 图表 + LaTeX 表格)
+├── plot_case_time_saving_standalone.py # 时间效率可视化 (三子图 b/c/d + 组合图)
+└── README.md                           # 本文档
 ```
 
 ---
 
 ## 实验流程
-
-### 多人实验 (2+ 标注者, 推荐)
-
-```bash
-# Step 0: 生成预分割 mask（如未生成）
-python generate_masks.py --image-dir ./datasets/images --output-dir ./datasets/masks
-
-# Step 1: 生成实验配置 (交叉设计)
-python run_experiment.py generate-config \
-    --image-dir ./datasets/images --mask-dir ./datasets/masks \
-    --annotators alice bob \
-    --output-dir ./experiment_001
-
-# Step 2: 运行实验
-python run_experiment.py run --config experiment_001/experiment_config.json
-
-# Step 3: 统计分析
-python analyze_results.py --log experiment_001/experiment_log.csv --output-dir ./analysis
-```
 
 ### 单人实验 (1 位标注者)
 
@@ -64,6 +46,11 @@ python run_experiment.py run --config experiment_single/experiment_config.json
 
 # 统计分析 (按图像配对检验)
 python analyze_results.py --log experiment_single/experiment_log.csv --output-dir ./analysis
+
+# 时间效率可视化
+python plot_case_time_saving_standalone.py \
+    --input experiment_single/experiment_log.csv \
+    --output-dir ./figures
 ```
 
 > **单人实验要点**: Round 2 图像顺序与 Round 1 不同（已自动打乱），洗脱期 ≥ 1 周避免记忆效应。分析时使用配对 Wilcoxon signed-rank 检验。
@@ -213,7 +200,62 @@ python analyze_results.py \
 
 ---
 
-## 五、实验设计要点
+## 五、时间效率可视化 (plot_case_time_saving_standalone.py)
+
+### 功能
+
+生成 **三个子图 + 一个组合图**，完整展示人工 vs AI辅助分割的时间效率对比:
+
+| 子图 | 标题 | 内容 |
+|------|------|------|
+| b | Reporting time | 小提琴图 + 箱线图 + 散点，对比 Manual vs AI 耗时分布，标注缩短百分比和 P 值 |
+| c | Within-case time saving | 病例级柱状图，绿色 = AI更快，红色 = AI更慢，橙色虚线 = 均值 |
+| d | Annotator-stratified acceleration | 按标注者分层展示时间减少百分比，含 Bootstrap 95% 置信区间 |
+| bcd | 三子图组合 | b/c/d 水平并排 |
+
+### 数据来源
+
+读取 `annotator.py` 输出的日志 CSV，按 `image_name` 透视 `mode` 列，
+将"每行一次标注"转换为"每行一个病例"的配对格式 (`manual_time_sec` vs `ai_time_sec`)，
+并从 `annotator` 列提取 `ai_physician` 用于子图 d 的分层分析。
+
+### 使用
+
+```bash
+# 默认读取 segmentation_time/experiment_log.csv，输出到 segmentation_time/output/
+python plot_case_time_saving_standalone.py
+
+# 指定输入文件和输出目录
+python plot_case_time_saving_standalone.py \
+    --input experiment_001/experiment_log.csv \
+    --output-dir ./figures
+
+# 自定义输出文件名前缀
+python plot_case_time_saving_standalone.py \
+    --input experiment_001/experiment_log.csv \
+    --stem my_experiment
+```
+
+### 参数
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `--input` | `experiment_log.csv` | annotator.py 输出的日志 CSV |
+| `--output-dir` | `output/` | 输出目录，自动创建 |
+| `--stem` | `segmentation_efficiency` | 输出文件名前缀 |
+
+### 输出 (4 图表 × 3 格式 = 12 文件)
+
+| 文件（以默认 stem 为例） | 说明 |
+|------|------|
+| `segmentation_efficiency_b_reporting_time.{png,pdf,svg}` | 子图 b: 报告耗时分布 |
+| `segmentation_efficiency_c_case_time_saving.{png,pdf,svg}` | 子图 c: 病例级时间节省 |
+| `segmentation_efficiency_d_physician_time_saving.{png,pdf,svg}` | 子图 d: 标注者分层 |
+| `segmentation_efficiency_bcd_combined.{png,pdf,svg}` | 三子图组合 |
+
+---
+
+## 六、实验设计要点
 
 ### 参与者
 - 多人: 2-3 人 (推荐交叉设计)
@@ -235,5 +277,5 @@ python analyze_results.py \
 ## 依赖安装
 
 ```bash
-pip install opencv-python numpy scipy matplotlib
+pip install opencv-python numpy scipy matplotlib pandas
 ```
