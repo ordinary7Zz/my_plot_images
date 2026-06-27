@@ -35,6 +35,11 @@ python run_experiment.py generate-config \
     --annotators alice \
     --output-dir ./experiment_single \
     --no-cross-over
+python run_experiment.py generate-config ^
+    --image-dir ./datasets/images --mask-dir ./datasets/masks ^
+    --annotators alice ^
+    --output-dir ./experiment_single ^
+    --no-cross-over
 
 # Round 1: 运行 (手动标注)
 python run_experiment.py run --config experiment_single/experiment_config.json
