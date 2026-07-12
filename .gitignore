@@ -40,4 +40,4 @@ claude/*
 .matplotlib/*
 
 # 保留 segmentation_time/experiment_single 下的所有文件
-!segmentation_time/experiment_single/**
+# !segmentation_time/experiment_single/**
