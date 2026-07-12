@@ -1,15 +1,14 @@
 """
-数据集特征综合绘图脚本
-功能：将原 Figure S3（良/恶性数量柱状图）与 Figure S4（病灶位置与尺寸分布）合并为单张图。
+数据集特征分别绘图脚本
+功能：分别输出每个子图（PNG 含文字 + SVG 无文字），共 11 个子图。
 
-布局：
-  Row 0: (a) 各数据集良/恶性数量柱状图（对数 y 轴，全宽）
-  Row 1: (b) 各数据集病灶位置 2D KDE（上方一行）
-  Row 2:      各数据集病灶相对尺寸 1D KDE（下方一行）
+子图清单：
+  (a)  各数据集良/恶性数量柱状图（对数 y 轴）          ×1
+  (b)  各数据集病灶位置 2D KDE                          ×5
+  (c)  各数据集病灶相对尺寸 1D KDE                       ×5
+  合计 11 个子图，每个输出 .png 和 .svg
 
-输出：
-  1. dataset_characteristics.svg — 无文字版本（方便后续手动标注）
-  2. dataset_characteristics.png — 含完整文字
+输出目录：脚本同级 panels/ 文件夹
 """
 
 import os
@@ -20,8 +19,6 @@ from scipy import ndimage
 from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
-from matplotlib.patches import Patch
-from matplotlib import gridspec
 from tqdm import tqdm
 
 
@@ -50,9 +47,9 @@ mask_dirs = {
 # 类别名称
 class_names = ["Benign", "Malignant"]
 
-# 输出
-output_dir = os.path.dirname(os.path.abspath(__file__))
-output_name = "dataset_characteristics"
+# 输出目录
+output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panels")
+os.makedirs(output_dir, exist_ok=True)
 
 # ======================== 配置区域 ========================
 # 字号
@@ -63,7 +60,6 @@ FONTSIZE_BAR_TITLE = 11
 FONTSIZE_PANEL_TITLE = 9
 FONTSIZE_PANEL_TICK = 7
 FONTSIZE_PANEL_LABEL = 8
-FONTSIZE_PANEL_LETTER = 14
 
 # 配色
 bar_colors = ["#1B4F72", "#C6975B"]  # Benign, Malignant
@@ -85,9 +81,10 @@ kde_size_points = 500
 shared_size_margin = 0.2
 position_contour_levels = 15
 
-# 图像尺寸
-fig_width = 11.5
-fig_height = 9.5
+# 各子图尺寸（英寸）
+FIGSIZE_BAR = (8.0, 4.5)
+FIGSIZE_POSITION = (4.5, 4.5)
+FIGSIZE_SIZE = (4.5, 3.0)
 
 
 # ======================== 掩码统计 ========================
@@ -156,149 +153,7 @@ def compute_shared_position_scale(density_maps, n_levels=position_contour_levels
     return levels, vmax
 
 
-# ======================== 综合绘图 ========================
-def plot_combined_figure(dataset_stats, shared_size_xlim,
-                        shared_levels, shared_vmax,
-                        save_svg=True, save_png=True):
-    """
-    绘制合并后的数据集特征图。
-
-    布局：
-      Row 0: (a) 良/恶性数量柱状图（全宽）
-      Row 1: (b) 各数据集位置 KDE
-      Row 2:     各数据集尺寸 KDE
-    """
-    n = len(dataset_stats)
-
-    fig = plt.figure(figsize=(fig_width, fig_height))
-    gs = gridspec.GridSpec(
-        3, n, height_ratios=[1.6, 1.2, 0.8],
-        hspace=0.38, wspace=0.12,
-    )
-
-    # ---- Row 0: 柱状图 ----
-    ax_bar = fig.add_subplot(gs[0, :])
-
-    x = np.arange(n)
-    benign = [class_counts[name][0] for name in dataset_names]
-    malignant = [class_counts[name][1] for name in dataset_names]
-
-    bars1 = ax_bar.bar(x - bar_width / 2, benign, bar_width,
-                       color=bar_colors[0], edgecolor='none', label=class_names[0])
-    bars2 = ax_bar.bar(x + bar_width / 2, malignant, bar_width,
-                       color=bar_colors[1], edgecolor='none', label=class_names[1])
-
-    ax_bar.set_yscale('log')
-    ax_bar.set_xticks(x)
-    ax_bar.set_xticklabels(dataset_names, fontsize=FONTSIZE_BAR_TICK)
-    ax_bar.set_ylabel('Number of images', fontsize=FONTSIZE_BAR_LABEL)
-    ax_bar.set_title('Class distributions across thyroid ultrasound datasets',
-                     fontsize=FONTSIZE_BAR_TITLE, fontweight='bold', pad=8)
-
-    all_vals = benign + malignant
-    ax_bar.set_ylim(min(all_vals) * 0.5, max(all_vals) * 3)
-
-    for bars in [bars1, bars2]:
-        for bar in bars:
-            h_bar = bar.get_height()
-            ax_bar.annotate(f'{h_bar:,.0f}',
-                            xy=(bar.get_x() + bar.get_width() / 2, h_bar),
-                            xytext=(0, 2), textcoords="offset points",
-                            ha='center', va='bottom', fontsize=FONTSIZE_BAR_ANNOT)
-
-    ax_bar.legend(loc='upper left', fontsize=FONTSIZE_BAR_TICK, framealpha=0.9)
-    ax_bar.tick_params(axis='y', labelsize=FONTSIZE_BAR_TICK)
-
-    # 面板标号 a
-    ax_bar.text(-0.02, 1.08, 'a', transform=ax_bar.transAxes,
-                fontsize=FONTSIZE_PANEL_LETTER, fontweight='bold', va='top')
-
-    # ---- Row 1: 位置 KDE ----
-    ax_pos_list = []
-    for i, stats in enumerate(dataset_stats):
-        ax_pos = fig.add_subplot(gs[1, i])
-        ax_pos_list.append(ax_pos)
-
-        if stats['position_grid'] is not None:
-            X, Y, Z = stats['position_grid']
-            ax_pos.contourf(X, Y, Z, levels=shared_levels, cmap=position_cmap,
-                            norm=Normalize(vmin=0, vmax=shared_vmax))
-
-        ax_pos.set_xlim(0, 1)
-        ax_pos.set_ylim(0, 1)
-        ax_pos.set_aspect('equal')
-        # 超声图像 y 轴自上而下，翻转 y 轴使分布图方向与图像一致
-        ax_pos.invert_yaxis()
-
-        # 标题：数据集名 + 样本数
-        n_samples = stats['n_samples']
-        title = f"{stats['dataset_name']}" if n_samples == 0 else \
-                f"{stats['dataset_name']} (N={n_samples:,})"
-        ax_pos.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
-
-        ax_pos.set_xticks(np.arange(0, 1.1, 0.5))
-        ax_pos.set_yticks(np.arange(0, 1.1, 0.5))
-        ax_pos.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
-
-        if i == 0:
-            ax_pos.set_ylabel('pos_y', fontsize=FONTSIZE_PANEL_LABEL)
-        else:
-            ax_pos.set_yticklabels([])
-        ax_pos.set_xlabel('pos_x', fontsize=FONTSIZE_PANEL_LABEL)
-
-    # 面板标号 b
-    ax_pos_list[0].text(-0.45, 1.30, 'b', transform=ax_pos_list[0].transAxes,
-                        fontsize=FONTSIZE_PANEL_LETTER, fontweight='bold', va='top')
-
-    # ---- Row 2: 尺寸 KDE ----
-    ax_size_list = []
-    for i, stats in enumerate(dataset_stats):
-        ax_size = fig.add_subplot(gs[2, i])
-        ax_size_list.append(ax_size)
-
-        rel_sizes = stats['rel_sizes']
-        n_samples = len(rel_sizes)
-
-        if n_samples < 2:
-            ax_size.text(0.5, 0.5, 'N/A', ha='center', va='center',
-                        transform=ax_size.transAxes, fontsize=FONTSIZE_PANEL_TICK)
-            ax_size.set_xlim(0, shared_size_xlim)
-            ax_size.set_ylim(0, 1)
-        else:
-            kde = gaussian_kde(rel_sizes)
-            x_range = np.linspace(0, shared_size_xlim, kde_size_points)
-            density = kde(x_range)
-
-            ax_size.plot(x_range, density, color=size_edge_color, linewidth=1.2)
-            ax_size.fill_between(x_range, density, alpha=0.4, color=size_color)
-            ax_size.set_xlim(0, shared_size_xlim)
-            ax_size.set_ylim(0, None)
-
-        ax_size.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
-        ax_size.set_xlabel('relative size', fontsize=FONTSIZE_PANEL_LABEL)
-
-        # density 值的绝对大小无实际意义，隐藏所有 y 轴刻度标签
-        ax_size.set_yticks([])
-        if i == 0:
-            ax_size.set_ylabel('density', fontsize=FONTSIZE_PANEL_LABEL)
-
-    # ---- 保存 PNG（含文字）----
-    if save_png:
-        plt.tight_layout()
-        png_path = os.path.join(output_dir, f"{output_name}.png")
-        fig.savefig(png_path, format='png', bbox_inches='tight', dpi=200)
-        print(f"PNG (含文字) 已保存: {png_path}")
-
-    # ---- 保存 SVG（无文字）----
-    if save_svg:
-        _hide_all_text(fig)
-        svg_path = os.path.join(output_dir, f"{output_name}.svg")
-        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
-        print(f"SVG (无文字) 已保存: {svg_path}")
-
-    plt.close(fig)
-
-
+# ======================== 通用保存工具 ========================
 def _hide_all_text(fig):
     """隐藏 figure 中所有文字（保留布局和图形元素）。"""
     for ax in fig.get_axes():
@@ -316,9 +171,133 @@ def _hide_all_text(fig):
                 t.set_color('none')
 
 
+def save_panel(fig, panel_name, save_png=True, save_svg=True):
+    """保存单个子图：PNG（含文字）+ SVG（无文字）。"""
+    fig.tight_layout()
+
+    if save_png:
+        png_path = os.path.join(output_dir, f"{panel_name}.png")
+        fig.savefig(png_path, format='png', bbox_inches='tight', dpi=200)
+        print(f"  PNG: {png_path}")
+
+    if save_svg:
+        _hide_all_text(fig)
+        svg_path = os.path.join(output_dir, f"{panel_name}.svg")
+        fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
+        print(f"  SVG: {svg_path}")
+
+    plt.close(fig)
+
+
+# ======================== 子图绘图函数 ========================
+def plot_bar_panel(save_png=True, save_svg=True):
+    """(a) 各数据集良/恶性数量柱状图。"""
+    n = len(dataset_names)
+    x = np.arange(n)
+    benign = [class_counts[name][0] for name in dataset_names]
+    malignant = [class_counts[name][1] for name in dataset_names]
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_BAR)
+
+    bars1 = ax.bar(x - bar_width / 2, benign, bar_width,
+                   color=bar_colors[0], edgecolor='none', label=class_names[0])
+    bars2 = ax.bar(x + bar_width / 2, malignant, bar_width,
+                   color=bar_colors[1], edgecolor='none', label=class_names[1])
+
+    ax.set_yscale('log')
+    ax.set_xticks(x)
+    ax.set_xticklabels(dataset_names, fontsize=FONTSIZE_BAR_TICK)
+    ax.set_ylabel('Number of images', fontsize=FONTSIZE_BAR_LABEL)
+    ax.set_title('Class distributions across thyroid ultrasound datasets',
+                 fontsize=FONTSIZE_BAR_TITLE, fontweight='bold', pad=8)
+
+    all_vals = benign + malignant
+    ax.set_ylim(min(all_vals) * 0.5, max(all_vals) * 3)
+
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            h_bar = bar.get_height()
+            ax.annotate(f'{h_bar:,.0f}',
+                        xy=(bar.get_x() + bar.get_width() / 2, h_bar),
+                        xytext=(0, 2), textcoords="offset points",
+                        ha='center', va='bottom', fontsize=FONTSIZE_BAR_ANNOT)
+
+    ax.legend(loc='upper left', fontsize=FONTSIZE_BAR_TICK, framealpha=0.9)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_BAR_TICK)
+
+    save_panel(fig, "panel_a_class_distribution", save_png, save_svg)
+
+
+def plot_position_panel(stats, shared_levels, shared_vmax,
+                        save_png=True, save_svg=True):
+    """(b) 单个数据集的病灶位置 2D KDE。"""
+    name = stats['dataset_name']
+    n_samples = stats['n_samples']
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_POSITION)
+
+    if stats['position_grid'] is not None and shared_levels is not None:
+        X, Y, Z = stats['position_grid']
+        ax.contourf(X, Y, Z, levels=shared_levels, cmap=position_cmap,
+                    norm=Normalize(vmin=0, vmax=shared_vmax))
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect('equal')
+    # 超声图像 y 轴自上而下，翻转 y 轴使分布图方向与图像一致
+    ax.invert_yaxis()
+
+    title = f"{name}" if n_samples == 0 else f"{name} (N={n_samples:,})"
+    ax.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
+
+    ax.set_xticks(np.arange(0, 1.1, 0.5))
+    ax.set_yticks(np.arange(0, 1.1, 0.5))
+    ax.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
+    ax.set_ylabel('pos_y', fontsize=FONTSIZE_PANEL_LABEL)
+    ax.set_xlabel('pos_x', fontsize=FONTSIZE_PANEL_LABEL)
+
+    save_panel(fig, f"panel_b_position_{name}", save_png, save_svg)
+
+
+def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
+    """(c) 单个数据集的病灶相对尺寸 1D KDE。"""
+    name = stats['dataset_name']
+    n_samples = stats['n_samples']
+    rel_sizes = stats['rel_sizes']
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SIZE)
+
+    if n_samples < 2:
+        ax.text(0.5, 0.5, 'N/A', ha='center', va='center',
+                transform=ax.transAxes, fontsize=FONTSIZE_PANEL_TICK)
+        ax.set_xlim(0, shared_size_xlim)
+        ax.set_ylim(0, 1)
+    else:
+        kde = gaussian_kde(rel_sizes)
+        x_range = np.linspace(0, shared_size_xlim, kde_size_points)
+        density = kde(x_range)
+
+        ax.plot(x_range, density, color=size_edge_color, linewidth=1.2)
+        ax.fill_between(x_range, density, alpha=0.4, color=size_color)
+        ax.set_xlim(0, shared_size_xlim)
+        ax.set_ylim(0, None)
+
+    ax.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
+    ax.set_xlabel('relative size', fontsize=FONTSIZE_PANEL_LABEL)
+    # density 值的绝对大小无实际意义，隐藏所有 y 轴刻度标签
+    ax.set_yticks([])
+    ax.set_ylabel('density', fontsize=FONTSIZE_PANEL_LABEL)
+
+    title = f"{name}" if n_samples == 0 else f"{name} (N={n_samples:,})"
+    ax.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
+
+    save_panel(fig, f"panel_c_size_{name}", save_png, save_svg)
+
+
 # ======================== 主函数 ========================
 def main():
     print(f"共 {len(dataset_names)} 个数据集: {dataset_names}")
+    print(f"输出目录: {output_dir}")
     print("=" * 60)
 
     # 收集掩码统计
@@ -396,18 +375,26 @@ def main():
         print(f"共享位置密度上限: {shared_vmax:.6f}")
     print("=" * 60)
 
-    # 绘图
-    print("\n正在绘制综合图...")
-    plot_combined_figure(
-        dataset_stats,
-        shared_size_xlim,
-        shared_levels,
-        shared_vmax,
-    )
+    # ---- 分别绘制 11 个子图 ----
+    print("\n正在绘制各子图...")
 
-    print("\n完成！输出文件：")
-    print(f"  - {os.path.join(output_dir, output_name + '.png')} (含文字)")
-    print(f"  - {os.path.join(output_dir, output_name + '.svg')} (无文字)")
+    # (a) 柱状图 ×1
+    print("\n[panel a] 良/恶性数量柱状图")
+    plot_bar_panel()
+
+    # (b) 位置 KDE ×5
+    print("\n[panel b] 病灶位置 2D KDE")
+    for stats in dataset_stats:
+        plot_position_panel(stats, shared_levels, shared_vmax)
+
+    # (c) 尺寸 KDE ×5
+    print("\n[panel c] 病灶相对尺寸 1D KDE")
+    for stats in dataset_stats:
+        plot_size_panel(stats, shared_size_xlim)
+
+    print("\n" + "=" * 60)
+    print(f"完成！共输出 11 个子图（每个含 .png 和 .svg），保存于：")
+    print(f"  {output_dir}")
 
 
 if __name__ == "__main__":
