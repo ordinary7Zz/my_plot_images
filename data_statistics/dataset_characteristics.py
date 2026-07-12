@@ -44,7 +44,7 @@ mask_dirs = {
     "TN5K":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/masks",
     "ThyroidXL": "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/masks",
     "DDTI":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/masks",
-    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ZJH-8K/masks",
+    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/finall_data/mask",
 }
 
 # 类别名称
@@ -86,8 +86,8 @@ shared_size_margin = 0.2
 position_contour_levels = 15
 
 # 图像尺寸
-fig_width = 14
-fig_height = 8.5
+fig_width = 11.5
+fig_height = 9.5
 
 
 # ======================== 掩码统计 ========================
@@ -172,8 +172,8 @@ def plot_combined_figure(dataset_stats, shared_size_xlim,
 
     fig = plt.figure(figsize=(fig_width, fig_height))
     gs = gridspec.GridSpec(
-        3, n, height_ratios=[1.0, 1.2, 0.8],
-        hspace=0.40, wspace=0.30,
+        3, n, height_ratios=[1.6, 1.2, 0.8],
+        hspace=0.38, wspace=0.12,
     )
 
     # ---- Row 0: 柱状图 ----
@@ -206,7 +206,7 @@ def plot_combined_figure(dataset_stats, shared_size_xlim,
                             xytext=(0, 2), textcoords="offset points",
                             ha='center', va='bottom', fontsize=FONTSIZE_BAR_ANNOT)
 
-    ax_bar.legend(loc='upper right', fontsize=FONTSIZE_BAR_TICK, framealpha=0.9)
+    ax_bar.legend(loc='upper left', fontsize=FONTSIZE_BAR_TICK, framealpha=0.9)
     ax_bar.tick_params(axis='y', labelsize=FONTSIZE_BAR_TICK)
 
     # 面板标号 a
@@ -227,6 +227,8 @@ def plot_combined_figure(dataset_stats, shared_size_xlim,
         ax_pos.set_xlim(0, 1)
         ax_pos.set_ylim(0, 1)
         ax_pos.set_aspect('equal')
+        # 超声图像 y 轴自上而下，翻转 y 轴使分布图方向与图像一致
+        ax_pos.invert_yaxis()
 
         # 标题：数据集名 + 样本数
         n_samples = stats['n_samples']
@@ -275,10 +277,10 @@ def plot_combined_figure(dataset_stats, shared_size_xlim,
         ax_size.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
         ax_size.set_xlabel('relative size', fontsize=FONTSIZE_PANEL_LABEL)
 
+        # density 值的绝对大小无实际意义，隐藏所有 y 轴刻度标签
+        ax_size.set_yticks([])
         if i == 0:
             ax_size.set_ylabel('density', fontsize=FONTSIZE_PANEL_LABEL)
-        else:
-            ax_size.set_yticklabels([])
 
     # ---- 保存 PNG（含文字）----
     if save_png:
