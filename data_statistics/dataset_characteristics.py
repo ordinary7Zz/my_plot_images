@@ -19,6 +19,7 @@ from scipy import ndimage
 from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize
+from matplotlib.ticker import MaxNLocator
 from tqdm import tqdm
 
 
@@ -284,8 +285,8 @@ def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
 
     ax.tick_params(axis='both', labelsize=FONTSIZE_PANEL_TICK)
     ax.set_xlabel('relative size', fontsize=FONTSIZE_PANEL_LABEL)
-    # density 值的绝对大小无实际意义，隐藏所有 y 轴刻度标签
-    ax.set_yticks([])
+    # 使用 MaxNLocator 自动生成简洁的 y 轴刻度
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=4, integer=False))
     ax.set_ylabel('density', fontsize=FONTSIZE_PANEL_LABEL)
 
     title = f"{name}" if n_samples == 0 else f"{name} (N={n_samples:,})"
