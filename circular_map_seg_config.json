@@ -36,7 +36,7 @@
       "category_map": {
         "Datasets": [
           "RJH-7K",
-          "ZJH-2K",
+          "ZJH-8K",
           "ThyroidXL",
           "PKTN",
           "TN3K",
@@ -50,7 +50,7 @@
           "ThyroidXL": 85.75,
           "PKTN": 76.89,
           "TN5K": 78.54,
-          "ZJH-2K": 80.72
+          "ZJH-8K": 80.72
         },
         "MedSegX": {
           "TN3K": 83.93,
@@ -58,7 +58,7 @@
           "ThyroidXL": 79.98,
           "PKTN": 80.63,
           "TN5K": 83.10,
-          "ZJH-2K": 84.06
+          "ZJH-8K": 84.06
         },
         "MedSAM2": {
           "TN3K": 84.47,
@@ -66,7 +66,7 @@
           "ThyroidXL": 83.74,
           "PKTN": 80.71,
           "TN5K": 81.22,
-          "ZJH-2K": 90.73
+          "ZJH-8K": 90.73
         },
         "UltraFedFM": {
           "TN3K": 81.18,
@@ -74,7 +74,7 @@
           "ThyroidXL": 84.70,
           "PKTN": 75.31,
           "TN5K": 77.13,
-          "ZJH-2K": 80.64
+          "ZJH-8K": 80.64
         },
         "ThyroidXAgent": {
           "TN3K": 85.28,
@@ -82,7 +82,7 @@
           "ThyroidXL": 87.58,
           "PKTN": 82.96,
           "TN5K": 83.26,
-          "ZJH-2K": 96.83
+          "ZJH-8K": 96.83
         }
       }
     },
@@ -95,7 +95,7 @@
       "category_map": {
         "Datasets": [
           "RJH-7K",
-          "ZJH-2K",
+          "ZJH-8K",
           "ThyroidXL",
           "PKTN",
           "TN3K",
@@ -109,7 +109,7 @@
           "ThyroidXL": 22.42,
           "PKTN": 26.88,
           "TN5K": 22.32,
-          "ZJH-2K": 18.37
+          "ZJH-8K": 18.37
         },
         "MedSegX": {
           "TN3K": 10.95,
@@ -117,7 +117,7 @@
           "ThyroidXL": 11.07,
           "PKTN": 10.83,
           "TN5K": 11.76,
-          "ZJH-2K": 10.96
+          "ZJH-8K": 10.96
         },
         "MedSAM2": {
           "TN3K": 11.51,
@@ -125,7 +125,7 @@
           "ThyroidXL": 6.91,
           "PKTN": 10.69,
           "TN5K": 10.94,
-          "ZJH-2K": 6.79
+          "ZJH-8K": 6.79
         },
         "UltraFedFM": {
           "TN3K": 14.98,
@@ -133,7 +133,7 @@
           "ThyroidXL": 8.10,
           "PKTN": 16.08,
           "TN5K": 14.96,
-          "ZJH-2K": 14.57
+          "ZJH-8K": 14.57
         },
         "ThyroidXAgent": {
           "TN3K": 10.31,
@@ -141,7 +141,7 @@
           "ThyroidXL": 5.43,
           "PKTN": 9.01,
           "TN5K": 10.12,
-          "ZJH-2K": 0.36
+          "ZJH-8K": 0.36
         }
       }
     }

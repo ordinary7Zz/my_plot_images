@@ -37,7 +37,7 @@
       ],
       "category_map": {
         "Datasets": [
-          "ZJH-2K",
+          "ZJH-8K",
           "DDTI",
           "ThyroidXL",
           "TN5K",
@@ -50,35 +50,35 @@
           "DDTI": 0.6346,
           "ThyroidXL": 0.7059,
           "TN5K": 0.7737,
-          "ZJH-2K": 0.6109
+          "ZJH-8K": 0.6109
         },
         "Gemini-2.5-Pro": {
           "TN3K": 0.6587,
           "DDTI": 0.6156,
           "ThyroidXL": 0.6246,
           "TN5K": 0.6873,
-          "ZJH-2K": 0.6493
+          "ZJH-8K": 0.6493
         },
         "UltraFedFM": {
           "TN3K": 0.8261,
           "DDTI": 0.7318,
           "ThyroidXL": 0.9039,
           "TN5K": 0.8898,
-          "ZJH-2K": 0.8915
+          "ZJH-8K": 0.8915
         },
         "MedGemma": {
           "TN3K": 0.8292,
           "DDTI": 0.8055,
           "ThyroidXL": 0.9271,
           "TN5K": 0.8942,
-          "ZJH-2K": 0.8776
+          "ZJH-8K": 0.8776
         },
         "ThyroidXAgent": {
           "TN3K": 0.8892,
           "DDTI": 0.7991,
           "ThyroidXL": 0.9676,
           "TN5K": 0.9472,
-          "ZJH-2K": 0.9175
+          "ZJH-8K": 0.9175
         }
       }
     },
@@ -92,7 +92,7 @@
       ],
       "category_map": {
         "Datasets": [
-          "ZJH-2K",
+          "ZJH-8K",
           "DDTI",
           "ThyroidXL",
           "TN5K",
@@ -105,35 +105,35 @@
           "DDTI": 0.3578,
           "ThyroidXL": 0.6237,
           "TN5K": 0.8920,
-          "ZJH-2K": 0.8311
+          "ZJH-8K": 0.8311
         },
         "Gemini-2.5-Pro": {
           "TN3K": 0.6205,
           "DDTI": 0.3924,
           "ThyroidXL": 0.4914,
           "TN5K": 0.8462,
-          "ZJH-2K": 0.8403
+          "ZJH-8K": 0.8403
         },
         "UltraFedFM": {
           "TN3K": 0.8531,
           "DDTI": 0.4487,
           "ThyroidXL": 0.9354,
           "TN5K": 0.8222,
-          "ZJH-2K": 0.9469
+          "ZJH-8K": 0.9469
         },
         "MedGemma": {
           "TN3K": 0.8047,
           "DDTI": 0.5537,
           "ThyroidXL": 0.9001,
           "TN5K": 0.9247,
-          "ZJH-2K": 0.9289
+          "ZJH-8K": 0.9289
         },
         "ThyroidXAgent": {
           "TN3K": 0.9045,
           "DDTI": 0.6663,
           "ThyroidXL": 0.9653,
           "TN5K": 0.9752,
-          "ZJH-2K": 0.9711
+          "ZJH-8K": 0.9711
         }
       }
     }
