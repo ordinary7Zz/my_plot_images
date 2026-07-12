@@ -35,7 +35,7 @@ class_counts = {
     "TN5K":      [1426, 3574],
     "ThyroidXL": [8172, 3459],
     "DDTI":      [304, 45],
-    "ZJH-8K":    [3238, 4792],
+    "ZJH-8K":    [3202, 4756],
 }
 
 # 掩码文件夹路径
@@ -44,7 +44,7 @@ mask_dirs = {
     "TN5K":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/masks",
     "ThyroidXL": "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/masks",
     "DDTI":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/masks",
-    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/finall_data/mask",
+    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ZJH-8K/masks",
 }
 
 # 类别名称
