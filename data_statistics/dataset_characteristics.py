@@ -180,8 +180,14 @@ def _hide_all_text(fig, keep_ticks=False):
                 t.set_color('none')
 
 
-def save_panel(fig, panel_name, save_png=True, save_svg=True, svg_keep_ticks=False):
-    """保存单个子图：PNG（含文字）+ SVG（无文字或仅刻度）。"""
+def save_panel(fig, panel_name, save_png=True, save_svg=True,
+               svg_keep_ticks=False, svg_notext=False):
+    """
+    保存单个子图：PNG（含文字）+ SVG（无文字或仅刻度）。
+
+    svg_keep_ticks=True 时 SVG 保留刻度数字。
+    svg_notext=True 时额外输出一个完全无文字的 SVG（{panel_name}_notext.svg）。
+    """
     fig.tight_layout()
 
     if save_png:
@@ -194,6 +200,12 @@ def save_panel(fig, panel_name, save_png=True, save_svg=True, svg_keep_ticks=Fal
         svg_path = os.path.join(output_dir, f"{panel_name}.svg")
         fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
         print(f"  SVG: {svg_path}")
+
+        if svg_notext and svg_keep_ticks:
+            _hide_all_text(fig, keep_ticks=False)
+            svg_notext_path = os.path.join(output_dir, f"{panel_name}_notext.svg")
+            fig.savefig(svg_notext_path, format='svg', bbox_inches='tight', dpi=150)
+            print(f"  SVG (无文字): {svg_notext_path}")
 
     plt.close(fig)
 
@@ -301,7 +313,8 @@ def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
     title = f"{name}" if n_samples == 0 else f"{name} (N={n_samples:,})"
     ax.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
 
-    save_panel(fig, f"panel_c_size_{name}", save_png, save_svg, svg_keep_ticks=True)
+    save_panel(fig, f"panel_c_size_{name}", save_png, save_svg,
+               svg_keep_ticks=True, svg_notext=True)
 
 
 # ======================== 主函数 ========================
