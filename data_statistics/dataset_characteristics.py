@@ -156,15 +156,22 @@ def compute_shared_position_scale(density_maps, n_levels=position_contour_levels
 
 
 # ======================== 通用保存工具 ========================
-def _hide_all_text(fig):
-    """隐藏 figure 中所有文字（保留布局和图形元素）。"""
+def _hide_all_text(fig, keep_ticks=False):
+    """
+    隐藏 figure 中的文字（保留布局和图形元素）。
+
+    keep_ticks=True 时保留坐标轴刻度数字，仅隐藏标题、轴标签、注释和图例。
+    """
     for ax in fig.get_axes():
         ax.set_title('')
         ax.set_xlabel('')
         ax.set_ylabel('')
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        ax.tick_params(axis='both', which='both', length=3, labelsize=0)
+        if keep_ticks:
+            ax.tick_params(axis='both', which='both', length=3)
+        else:
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.tick_params(axis='both', which='both', length=3, labelsize=0)
         for text in ax.texts:
             text.set_visible(False)
         leg = ax.get_legend()
@@ -173,8 +180,8 @@ def _hide_all_text(fig):
                 t.set_color('none')
 
 
-def save_panel(fig, panel_name, save_png=True, save_svg=True):
-    """保存单个子图：PNG（含文字）+ SVG（无文字）。"""
+def save_panel(fig, panel_name, save_png=True, save_svg=True, svg_keep_ticks=False):
+    """保存单个子图：PNG（含文字）+ SVG（无文字或仅刻度）。"""
     fig.tight_layout()
 
     if save_png:
@@ -183,7 +190,7 @@ def save_panel(fig, panel_name, save_png=True, save_svg=True):
         print(f"  PNG: {png_path}")
 
     if save_svg:
-        _hide_all_text(fig)
+        _hide_all_text(fig, keep_ticks=svg_keep_ticks)
         svg_path = os.path.join(output_dir, f"{panel_name}.svg")
         fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
         print(f"  SVG: {svg_path}")
@@ -294,7 +301,7 @@ def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
     title = f"{name}" if n_samples == 0 else f"{name} (N={n_samples:,})"
     ax.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
 
-    save_panel(fig, f"panel_c_size_{name}", save_png, save_svg)
+    save_panel(fig, f"panel_c_size_{name}", save_png, save_svg, svg_keep_ticks=True)
 
 
 # ======================== 主函数 ========================
