@@ -25,7 +25,7 @@ from tqdm import tqdm
 
 # ======================== 用户输入区域 ========================
 # 图中展示的数据集名称（需同时有类别计数和掩码数据）
-dataset_names = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "ZJH-8K"]
+dataset_names = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "ZJH-8K", "RJH-7K"]
 
 # 各数据集良/恶性数量 [benign, malignant]
 class_counts = {
@@ -193,11 +193,12 @@ def save_panel(fig, panel_name, save_png=True, save_svg=True):
 
 # ======================== 子图绘图函数 ========================
 def plot_bar_panel(save_png=True, save_svg=True):
-    """(a) 各数据集良/恶性数量柱状图。"""
-    n = len(dataset_names)
+    """(a) 各数据集良/恶性数量柱状图（仅含有良恶性计数的数据集）。"""
+    bar_datasets = [name for name in dataset_names if name in class_counts]
+    n = len(bar_datasets)
     x = np.arange(n)
-    benign = [class_counts[name][0] for name in dataset_names]
-    malignant = [class_counts[name][1] for name in dataset_names]
+    benign = [class_counts[name][0] for name in bar_datasets]
+    malignant = [class_counts[name][1] for name in bar_datasets]
 
     fig, ax = plt.subplots(figsize=FIGSIZE_BAR)
 
@@ -208,7 +209,7 @@ def plot_bar_panel(save_png=True, save_svg=True):
 
     ax.set_yscale('log')
     ax.set_xticks(x)
-    ax.set_xticklabels(dataset_names, fontsize=FONTSIZE_BAR_TICK)
+    ax.set_xticklabels(bar_datasets, fontsize=FONTSIZE_BAR_TICK)
     ax.set_ylabel('Number of images', fontsize=FONTSIZE_BAR_LABEL)
     ax.set_title('Class distributions across thyroid ultrasound datasets',
                  fontsize=FONTSIZE_BAR_TITLE, fontweight='bold', pad=8)
