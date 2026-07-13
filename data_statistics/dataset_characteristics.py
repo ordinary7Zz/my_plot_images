@@ -43,6 +43,7 @@ mask_dirs = {
     "ThyroidXL": "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/masks",
     "DDTI":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/masks",
     "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ZJH-8K/masks",
+    "RJH-7K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask",
 }
 
 # 类别名称
