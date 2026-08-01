@@ -11,6 +11,7 @@
 
 import os
 import glob
+import csv
 import numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -45,6 +46,9 @@ mask_dirs = [
 
 # 输出根目录（默认为当前脚本所在目录）
 output_root = os.path.dirname(os.path.abspath(__file__))
+
+# 汇总 CSV 文件路径（汇总所有数据集的 pos_x, pos_y, rel_sizes）
+summary_csv_path = os.path.join(output_root, "mask_distribution_summary.csv")
 
 # ======================== 配置区域 ========================
 # 字号统一设置
@@ -432,6 +436,12 @@ def main():
     print(f"位置分布统一密度上限: {shared_position_vmax:.6f}")
     print("=" * 60)
 
+    # 初始化汇总 CSV 文件（写入表头）
+    with open(summary_csv_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(["dataset_name", "pos_x", "pos_y", "rel_size"])
+    print(f"汇总 CSV 文件已初始化: {summary_csv_path}")
+
     for idx, stats in enumerate(dataset_stats, start=1):
         dataset_name = stats["dataset_name"]
         output_dir = stats["output_dir"]
@@ -447,6 +457,13 @@ def main():
         print(f"相对尺寸: mean={rel_sizes.mean():.4f}, std={rel_sizes.std():.4f}, "
               f"min={rel_sizes.min():.4f}, max={rel_sizes.max():.4f}")
         print("-" * 50)
+
+        # 追加写入汇总 CSV 文件（在绘图之前）
+        with open(summary_csv_path, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            for px, py, rs in zip(pos_x, pos_y, rel_sizes):
+                writer.writerow([dataset_name, float(px), float(py), float(rs)])
+        print(f"已追加 {n_samples} 条记录到汇总文件: {summary_csv_path}")
 
         # 绘制位置分布图
         print("\n绘制位置分布图...")

@@ -1,0 +1,7 @@
+type,metric,mode,mean,boot_ci_low,boot_ci_high,t_ci_low,t_ci_high,significant,note
+mean,Dice,Manual,0.8787,0.8428,0.9072,0.8442,0.9132,,
+mean,Dice,AI-Assisted,0.9029,0.8699,0.9278,0.8718,0.9341,,
+mean,HD95,Manual,18.99,15.16,23.53,14.54,23.44,,
+mean,HD95,AI-Assisted,15.28,11.29,20.25,10.47,20.09,,
+diff(AI-Manual),Dice,,0.0242,0.0045,0.0458,,,yes,正=AI更好
+diff(AI-Manual),HD95,,-3.71,-6.77,-0.87,,,yes,负=AI更好
