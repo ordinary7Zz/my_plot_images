@@ -33,7 +33,7 @@ class_counts = {
     "TN5K":      [1426, 3574],
     "ThyroidXL": [8172, 3459],
     "DDTI":      [304, 45],
-    "ZJH-8K":    [3202, 4756],
+    "ZJH-8K":    [2774, 4033],
 }
 
 # 掩码文件夹路径
@@ -42,7 +42,7 @@ mask_dirs = {
     "TN5K":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/TN5K/train/masks",
     "ThyroidXL": "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ThyroidXL/train/masks",
     "DDTI":      "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/DDTI/train/masks",
-    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ZJH-8K/masks",
+    "ZJH-8K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/train_val_test/ZJH-8K/masks_6807",
     "RJH-7K":    "/mnt/wangbd8/workspace/DataSets/ThyroidAgent/augtrain_PNG/mask",
 }
 

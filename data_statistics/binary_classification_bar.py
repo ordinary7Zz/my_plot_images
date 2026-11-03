@@ -12,7 +12,7 @@ import os
 
 # ======================== 用户输入区域 ========================
 # 数据集名称
-datasets = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "FinalData"]
+datasets = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "ZJH-8K"]
 
 # 二分类类别名称
 class_names = ["Benign", "Malignant"]
@@ -23,7 +23,7 @@ counts = [
     [1426, 3574],      # TN5K
     [8172, 3459],      # ThyroidXL
     [304, 45],     # DDTI
-    [3238, 4792],      # FinalData
+    [2774, 4033],      # ZJH-8K
 ]
 
 # 输出文件名（不含扩展名）
