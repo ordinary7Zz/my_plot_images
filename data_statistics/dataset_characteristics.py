@@ -8,7 +8,8 @@
   (c)  各数据集病灶相对尺寸 1D KDE                       ×5
   合计 11 个子图，每个输出 .png 和 .svg
 
-输出目录：脚本同级 panels/ 文件夹
+输出目录：脚本同级 panels/<dataset_name>/（各数据集子图）；
+          柱状图 (a) 在单数据集时同目录，多数据集时在 panels/overview/
 """
 
 import os
@@ -26,6 +27,7 @@ from tqdm import tqdm
 # ======================== 用户输入区域 ========================
 # 图中展示的数据集名称（需同时有类别计数和掩码数据）
 dataset_names = ["TN3K", "TN5K", "ThyroidXL", "DDTI", "ZJH-8K", "RJH-7K"]
+#dataset_names = ["ZJH-8K"]
 
 # 各数据集良/恶性数量 [benign, malignant]
 class_counts = {
@@ -49,9 +51,8 @@ mask_dirs = {
 # 类别名称
 class_names = ["Benign", "Malignant"]
 
-# 输出目录
+# 输出根目录（各数据集输出在 panels/<dataset_name>/ 下）
 output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "panels")
-os.makedirs(output_dir, exist_ok=True)
 
 # ======================== 配置区域 ========================
 # 字号
@@ -181,29 +182,35 @@ def _hide_all_text(fig, keep_ticks=False):
 
 
 def save_panel(fig, panel_name, save_png=True, save_svg=True,
-               svg_keep_ticks=False, svg_notext=False):
+               svg_keep_ticks=False, svg_notext=False, output_subdir=None):
     """
     保存单个子图：PNG（含文字）+ SVG（无文字或仅刻度）。
 
+    output_subdir: 相对 output_dir 的子目录名（通常为 dataset_name）。
     svg_keep_ticks=True 时 SVG 保留刻度数字。
     svg_notext=True 时额外输出一个完全无文字的 SVG（{panel_name}_notext.svg）。
     """
+    if not output_subdir:
+        raise ValueError("save_panel 需要指定 output_subdir（数据集名或 overview）")
+    dest_dir = os.path.join(output_dir, output_subdir)
+    os.makedirs(dest_dir, exist_ok=True)
+
     fig.tight_layout()
 
     if save_png:
-        png_path = os.path.join(output_dir, f"{panel_name}.png")
+        png_path = os.path.join(dest_dir, f"{panel_name}.png")
         fig.savefig(png_path, format='png', bbox_inches='tight', dpi=200)
         print(f"  PNG: {png_path}")
 
     if save_svg:
         _hide_all_text(fig, keep_ticks=svg_keep_ticks)
-        svg_path = os.path.join(output_dir, f"{panel_name}.svg")
+        svg_path = os.path.join(dest_dir, f"{panel_name}.svg")
         fig.savefig(svg_path, format='svg', bbox_inches='tight', dpi=150)
         print(f"  SVG: {svg_path}")
 
         if svg_notext and svg_keep_ticks:
             _hide_all_text(fig, keep_ticks=False)
-            svg_notext_path = os.path.join(output_dir, f"{panel_name}_notext.svg")
+            svg_notext_path = os.path.join(dest_dir, f"{panel_name}_notext.svg")
             fig.savefig(svg_notext_path, format='svg', bbox_inches='tight', dpi=150)
             print(f"  SVG (无文字): {svg_notext_path}")
 
@@ -247,7 +254,9 @@ def plot_bar_panel(save_png=True, save_svg=True):
     ax.legend(loc='upper left', fontsize=FONTSIZE_BAR_TICK, framealpha=0.9)
     ax.tick_params(axis='y', labelsize=FONTSIZE_BAR_TICK)
 
-    save_panel(fig, "panel_a_class_distribution", save_png, save_svg)
+    bar_subdir = bar_datasets[0] if n == 1 else "overview"
+    save_panel(fig, "panel_a_class_distribution", save_png, save_svg,
+               output_subdir=bar_subdir)
 
 
 def plot_position_panel(stats, shared_levels, shared_vmax,
@@ -278,7 +287,8 @@ def plot_position_panel(stats, shared_levels, shared_vmax,
     ax.set_ylabel('pos_y', fontsize=FONTSIZE_PANEL_LABEL)
     ax.set_xlabel('pos_x', fontsize=FONTSIZE_PANEL_LABEL)
 
-    save_panel(fig, f"panel_b_position_{name}", save_png, save_svg)
+    save_panel(fig, f"panel_b_position_{name}", save_png, save_svg,
+               output_subdir=name)
 
 
 def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
@@ -314,7 +324,7 @@ def plot_size_panel(stats, shared_size_xlim, save_png=True, save_svg=True):
     ax.set_title(title, fontsize=FONTSIZE_PANEL_TITLE, pad=3)
 
     save_panel(fig, f"panel_c_size_{name}", save_png, save_svg,
-               svg_keep_ticks=True, svg_notext=True)
+               svg_keep_ticks=True, svg_notext=True, output_subdir=name)
 
 
 # ======================== 主函数 ========================
@@ -416,8 +426,12 @@ def main():
         plot_size_panel(stats, shared_size_xlim)
 
     print("\n" + "=" * 60)
-    print(f"完成！共输出 11 个子图（每个含 .png 和 .svg），保存于：")
-    print(f"  {output_dir}")
+    print("完成！各子图已按数据集保存于：")
+    for name in dataset_names:
+        print(f"  {os.path.join(output_dir, name)}/")
+    bar_datasets = [n for n in dataset_names if n in class_counts]
+    if len(bar_datasets) > 1:
+        print(f"  {os.path.join(output_dir, 'overview')}/  (panel a 柱状图)")
 
 
 if __name__ == "__main__":
