@@ -1,6 +1,6 @@
 {
   "paths": {
-    "default_output_dir": "D:/workspace/ThyroidAgent/plot_images/out"
+    "default_output_dir": "out"
   },
   "plot": {
     "model_order": [
@@ -13,26 +13,29 @@
       "file_slug": "malignancy_tasks",
       "metric_title": "Classification",
       "comparison_plot": {
+        "xlim_min": 0.74,
+        "xlim_max": 0.88,
+        "xticks": [0.75, 0.78, 0.81, 0.84, 0.87],
         "rows": [
           {
-            "label": "Subtype Classification\n(Tiger-Model)-\nAUPRC",
-            "baseline": 0.7117,
-            "target": 0.7863
+            "label": "PTC Subtype\nAUPRC",
+            "baseline": 0.7741,
+            "target": 0.7998
           },
           {
-            "label": "Subtype Classification\n(Tiger-Model)-\nAUROC",
-            "baseline": 0.7136,
-            "target": 0.8053
+            "label": "PTC Subtype\nAUROC",
+            "baseline": 0.7535,
+            "target": 0.7831
           },
           {
-            "label": "Lymph Node Metastasis\n(LLNM Net) -\nAUPRC",
-            "baseline": 0.7363,
-            "target": 0.8808
+            "label": "Lymph Node Metastasis\nAUPRC",
+            "baseline": 0.8399,
+            "target": 0.8623
           },
           {
-            "label": "Lymph Node Metastasis\n(LLNM Net) -\nAUROC",
-            "baseline": 0.7665,
-            "target": 0.8642
+            "label": "Lymph Node Metastasis\nAUROC",
+            "baseline": 0.8121,
+            "target": 0.8556
           }
         ]
       }

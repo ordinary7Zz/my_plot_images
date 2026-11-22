@@ -47,7 +47,7 @@ DEFAULT_COMPARISON_PLOT_STYLE = {
     "xtick_fontsize": 18,  # X 轴刻度数字字号
     "grid_alpha": 0.63,  # 网格线透明度
     "grid_linewidth": 1.0,  # 网格线宽度
-    "show_confidence_intervals": True,  # 是否显示置信区间
+    "show_confidence_intervals": False,  # 是否显示置信区间
     "baseline_color": "#0860d4",  # baseline 点和标签颜色
     "target_color": "#f54818",  # target 点和标签颜色
     "line_color": "#6e6c6c",  # baseline 与 target 之间连线颜色
@@ -125,6 +125,9 @@ def plot_paired_comparison_chart(
 ) -> None:
     comparison_cfg = dataset_cfg.get("comparison_plot", {})
     style_cfg = dict(DEFAULT_COMPARISON_PLOT_STYLE)
+    for key, value in comparison_cfg.items():
+        if key != "rows" and key in style_cfg:
+            style_cfg[key] = value
     custom_rows = comparison_cfg.get("rows")
     baseline_model = str(style_cfg.get("baseline_model", model_order[1] if len(model_order) > 1 else model_order[0]))
     target_model = str(style_cfg.get("target_model", model_order[0]))
@@ -436,7 +439,12 @@ def main() -> None:
         cfg = load_json(args.config)
 
     style_matplotlib()
-    output_dir = args.output_dir or Path(cfg["paths"]["default_output_dir"])
+    if args.output_dir is not None:
+        output_dir = args.output_dir
+    else:
+        output_dir = Path(cfg["paths"]["default_output_dir"])
+        if not output_dir.is_absolute():
+            output_dir = DEFAULT_CONFIG_PATH.parent / output_dir
     target_datasets = args.datasets if args.datasets else list(cfg.get("default_datasets", []))
     model_order = list(cfg.get("plot", {}).get("model_order", []))
 
