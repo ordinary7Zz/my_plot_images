@@ -18,24 +18,24 @@
         "xticks": [0.75, 0.78, 0.81, 0.84, 0.87],
         "rows": [
           {
-            "label": "PTC Subtype\nAUPRC",
-            "baseline": 0.7741,
-            "target": 0.7998
-          },
-          {
             "label": "PTC Subtype\nAUROC",
-            "baseline": 0.7535,
-            "target": 0.7831
+            "baseline": 0.7877,
+            "target": 0.8089
           },
           {
-            "label": "Lymph Node Metastasis\nAUPRC",
-            "baseline": 0.8399,
-            "target": 0.8623
+            "label": "PTC Subtype\nAUPRC",
+            "baseline": 0.7764,
+            "target": 0.8271
           },
           {
             "label": "Lymph Node Metastasis\nAUROC",
             "baseline": 0.8121,
             "target": 0.8556
+          },
+          {
+            "label": "Lymph Node Metastasis\nAUPRC",
+            "baseline": 0.8399,
+            "target": 0.8623
           }
         ]
       }
