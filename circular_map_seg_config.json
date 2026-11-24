@@ -51,7 +51,7 @@
           "ThyroidXL": 85.75,
           "PKTN": 76.89,
           "TN5K": 78.54,
-          "ZJH-8K": 80.72,
+          "ZJH-8K": 76.53,
           "DDTI": 76.58
         },
         "MedSegX": {
@@ -60,7 +60,7 @@
           "ThyroidXL": 79.98,
           "PKTN": 80.63,
           "TN5K": 83.10,
-          "ZJH-8K": 84.06,
+          "ZJH-8K": 69.21,
           "DDTI": 75.12
         },
         "MedSAM2": {
@@ -69,7 +69,7 @@
           "ThyroidXL": 83.74,
           "PKTN": 80.71,
           "TN5K": 81.22,
-          "ZJH-8K": 90.73,
+          "ZJH-8K": 82.57,
           "DDTI": 84.72
         },
         "UltraFedFM": {
@@ -78,7 +78,7 @@
           "ThyroidXL": 84.70,
           "PKTN": 75.31,
           "TN5K": 77.13,
-          "ZJH-8K": 80.64,
+          "ZJH-8K": 77.56,
           "DDTI": 75.57
         },
         "ThyroidXAgent": {
@@ -87,7 +87,7 @@
           "ThyroidXL": 87.58,
           "PKTN": 82.96,
           "TN5K": 83.26,
-          "ZJH-8K": 96.83,
+          "ZJH-8K": 83.13,
           "DDTI": 85.62
         }
       }
@@ -116,7 +116,7 @@
           "ThyroidXL": 22.42,
           "PKTN": 26.88,
           "TN5K": 22.32,
-          "ZJH-8K": 18.37,
+          "ZJH-8K": 16.24,
           "DDTI": 17.12
         },
         "MedSegX": {
@@ -125,7 +125,7 @@
           "ThyroidXL": 11.07,
           "PKTN": 10.83,
           "TN5K": 11.76,
-          "ZJH-8K": 10.96,
+          "ZJH-8K": 23.48,
           "DDTI": 18.39
         },
         "MedSAM2": {
@@ -134,7 +134,7 @@
           "ThyroidXL": 6.91,
           "PKTN": 10.69,
           "TN5K": 10.94,
-          "ZJH-8K": 6.79,
+          "ZJH-8K": 13.51,
           "DDTI": 10.06
         },
         "UltraFedFM": {
@@ -143,7 +143,7 @@
           "ThyroidXL": 8.10,
           "PKTN": 16.08,
           "TN5K": 14.96,
-          "ZJH-8K": 14.57,
+          "ZJH-8K": 18.57,
           "DDTI": 18.12
         },
         "ThyroidXAgent": {
@@ -152,7 +152,7 @@
           "ThyroidXL": 5.43,
           "PKTN": 9.01,
           "TN5K": 10.12,
-          "ZJH-8K": 0.36,
+          "ZJH-8K": 12.09,
           "DDTI": 9.24
         }
       }
