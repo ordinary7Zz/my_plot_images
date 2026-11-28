@@ -19,13 +19,13 @@
         "rows": [
           {
             "label": "PTC Subtype\nAUROC",
-            "baseline": 0.7877,
-            "target": 0.8089
+            "baseline": 0.7535,
+            "target": 0.7831
           },
           {
             "label": "PTC Subtype\nAUPRC",
-            "baseline": 0.7764,
-            "target": 0.8271
+            "baseline": 0.7741,
+            "target": 0.7998
           },
           {
             "label": "Lymph Node Metastasis\nAUROC",
